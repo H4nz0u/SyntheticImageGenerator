@@ -1,8 +1,15 @@
 import yaml
-
+from transformations import create_transformation
 class Config:
     def __init__(self, config_path) -> None:
         self.params = self.load_config(config_path)
+        self._parse_transformations()
+    
+    def _parse_transformations(self):
+        transforms = []
+        for transformations in self["transformations"]:
+            transforms.append(create_transformation(**transformations))
+        self["transformations"] = transforms
     
     @staticmethod
     def load_config(config_path):
