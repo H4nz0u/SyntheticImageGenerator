@@ -1,0 +1,35 @@
+cars: "images/cars"
+enable_rotation: true
+fixed_rotation: -12
+format: jpg
+make_black_white: false
+monochrome: false
+noise: false
+noise_correlation: 300
+noise_intensity: 0.02
+number: 1
+output: "output"
+position: 0.4247329254925726
+rotation:
+- 2
+- 2
+seed: 7720873758630247359
+shadow: false
+shadow_frequency: 2
+shadow_intensity: 0.3
+shear_factor:
+- 0.5907488633812148
+- 0.5907488633812148
+signs: "images/signs"
+size:
+- 0.42516375735488754
+- 0.42516375735488754
+tilt_angle:
+- 7
+- 7
+zoom: false
+zoom_factor:
+- 1.6992902319604628
+zoom_position:
+- 0.35445118380056484
+- 0.15371910591299529
