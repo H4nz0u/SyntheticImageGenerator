@@ -1,0 +1,24 @@
+transformations:
+  "Typlabel-China, Typelabel-USA": #could also be "all"
+    - "name": "Rotate"
+      "angle": 45
+    - "name": "Scale"
+      "factor": 0.5
+  "Typlabel-Japan":
+    - "name": "Rotate"
+      "angle": 90
+    - "name": "Scale"
+      "factor": 0.5
+
+filters:
+  - "Brightness":
+    "factor": 0.5
+
+blending: "Standard"
+
+total_images: 20
+seed: 42
+object_amount: 
+  "Typlabel-China": 2
+  "Typlabel-USA": 1
+  "Typlabel-Japan": 3

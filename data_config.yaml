@@ -1,0 +1,4 @@
+root_path: images/
+background_folder: cars/
+foreground_objects:
+  Typlabel-China: signs/

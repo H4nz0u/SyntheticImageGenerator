@@ -1,6 +1,5 @@
 from .image import Image
 from typing import List
-from transformations.base_transform import BaseTransform
 from pathlib import Path
 import json
 from utilities.boundingbox import BoundingBox
@@ -9,6 +8,9 @@ class Object:
         self.image = Image(image_path)
         self.annoations = self.load_annotation(annotation_path)
         self.bbox, self.cl = self.parse_annotations(self.annoations)
+    
+    def get_np_image(self):
+        return self.image.get_image()
         
     def load_annotation(self, annotation_path: Path):
         with open(annotation_path, 'r') as file:
@@ -23,6 +25,6 @@ class Object:
         )
         return bbox, item["class"]
         
-    def apply_transformations(self, transformations: List[BaseTransform]):
+    def apply_transformations(self, transformations: List):
         for transformation in transformations:
             transformation.apply(self.image.get_image())

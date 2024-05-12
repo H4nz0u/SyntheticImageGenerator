@@ -1,6 +1,6 @@
 from .base_transform import Transformation
 from .transformation_registry import register_transformation
-from image_management.image import Image
+from image_management import Image, Object
 import cv2
 import numpy as np
 
@@ -8,11 +8,12 @@ import numpy as np
 class Rotate(Transformation):
     def __init__(self, angle):
         self.angle = angle
-    
+    """
     def __init__(self, min_angle, max_angle):
         self.angle = np.random.randint(min_angle, max_angle)
-    
-    def apply(self, image: cv2.typing.MatLike):
+    """
+    def apply(self, obj: Object):
+        image = obj.get_np_image()
         image_center = tuple(np.array(image.shape[1::-1]) / 2)
         
         height, width = image.shape[:2]

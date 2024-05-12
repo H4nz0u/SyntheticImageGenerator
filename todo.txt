@@ -1,0 +1,22 @@
+config:
+    - make two versions, one for current transformations, ones for all datarelated stuff
+    - allow for different transformations for different objects 
+    - dataloader (x)
+
+annotator: 
+    - transformations get bbox to be transformed aswell
+    - adapt the annotator to work with many different objects and types
+
+filter:
+    - register them the same way the transformations are done rn (might need better datastructure)
+
+random:
+    - find a way all classes can use the same random instance (with seeds, thread safe)
+    - allow transformation instances to generate new random value for each transformations
+
+scene:
+    - come up with a way to plug in different blending algorithms
+    - manage the different objects better
+
+
+read about cleanlab
