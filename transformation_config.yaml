@@ -1,5 +1,5 @@
 transformations:
-  "Typlabel-China, Typelabel-USA": #could also be "all"
+  "Typlabel-China, Typlabel-USA": #could also be "all"
     - "name": "Rotate"
       "angle": 45
     - "name": "Scale"
