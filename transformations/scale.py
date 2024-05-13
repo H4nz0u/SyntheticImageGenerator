@@ -1,6 +1,6 @@
 from .base_transform import Transformation
 from .transformation_registry import register_transformation
-from image_management.image import Image
+from image_management import ImgObject
 import cv2
 import numpy as np
 
@@ -9,10 +9,30 @@ class Scale(Transformation):
     def __init__(self, factor):
         self.factor = factor
         
-    def apply(self, image: cv2.typing.MatLike):
+    def apply(self, obj: ImgObject):
+        image = obj.image
         new_width = int(image.shape[1] * self.factor)
         new_height = int(image.shape[0] * self.factor)
         
         new_dim = (new_width, new_height)
         resized_image = cv2.resize(image, new_dim, interpolation=cv2.INTER_AREA)
-        return resized_image
+        obj.mask = cv2.resize(obj.mask, new_dim, interpolation=cv2.INTER_AREA)
+        obj.image = resized_image
+        obj.segmentation = [(int(point[0] * self.factor), int(point[1] * self.factor)) for point in obj.segmentation]
+        obj.bbox.coordinates = tuple(np.array(obj.bbox.coordinates) * self.factor)
+
+@register_transformation
+class RandomScale(Transformation):
+    def __init__(self, min_factor, max_factor):
+        self.min_factor = min_factor
+        self.max_factor = max_factor
+        
+    def apply(self, obj: ImgObject):
+        image = obj.image
+        factor = np.random.uniform(self.min_factor, self.max_factor)
+        new_width = int(image.shape[1] * factor)
+        new_height = int(image.shape[0] * factor)
+        
+        new_dim = (new_width, new_height)
+        resized_image = cv2.resize(image, new_dim, interpolation=cv2.INTER_AREA)
+        obj.image = resized_image

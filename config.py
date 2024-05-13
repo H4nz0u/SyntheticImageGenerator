@@ -69,7 +69,6 @@ class Config:
             self._validate_image(path)
     def _validate_image(self, path: str):
         images = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f.endswith('.png') or f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.JPG')]
-        print(path, len(images))
         if not images:
             raise ValueError(f'No images found in {path}')
     
@@ -116,9 +115,9 @@ class Config:
         return self.config.get(key, default)
                 
     def __getitem__(self, key):
-        if key not in self.params:
+        if key not in self.config.keys():
             raise KeyError(f'Key {key} not found in config')
-        return self.params[key]
+        return self.config[key]
     
     def __str__(self):
         return str(self.config)

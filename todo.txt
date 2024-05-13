@@ -8,11 +8,11 @@ annotator:
     - adapt the annotator to work with many different objects and types
 
 filter:
-    - register them the same way the transformations are done rn (might need better datastructure)
+    - register them the same way the transformations are done rn (might need better datastructure) (x)
 
 random:
     - find a way all classes can use the same random instance (with seeds, thread safe)
-    - allow transformation instances to generate new random value for each transformations
+    - allow transformation instances to generate new random value for each transformations (x)
 
 scene:
     - come up with a way to plug in different blending algorithms
@@ -20,3 +20,8 @@ scene:
 
 
 read about cleanlab
+
+
+today:
+    think of method to determine position of objects (at first maybe random but modular)
+    merge foreground objects with background

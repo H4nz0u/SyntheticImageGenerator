@@ -182,7 +182,6 @@ class CarImage:
             
             interpolated = np.interp(s_cdf, t_cdf, template_values).astype(np.uint8)
             result_color_chanels.append(interpolated[indices].reshape(source.shape))
-        print(len(result_color_chanels))
         self.signImage.image = cv2.cvtColor(cv2.merge(result_color_chanels), cv2.COLOR_Lab2BGR)
         
 

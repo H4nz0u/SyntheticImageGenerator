@@ -31,16 +31,6 @@ class SignImage:
         self.enable_rotation = kwargs.get("enable_rotation")
 
     def _cut_out_sign(self):
-        """
-        Extracts and rectifies the sign from the image using the bounding box.
-
-        Args:
-            sign: The image of the sign.
-            bounding_box: The bounding box.
-
-        Returns:
-            The rectified (straightened) cutout of the sign.
-        """
         black_mask = np.all(self.image == [0, 0, 0], axis=-1)
 
         # Replace black pixels with the new color
