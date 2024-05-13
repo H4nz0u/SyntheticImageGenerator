@@ -18,7 +18,10 @@ class Scale(Transformation):
         resized_image = cv2.resize(image, new_dim, interpolation=cv2.INTER_AREA)
         obj.mask = cv2.resize(obj.mask, new_dim, interpolation=cv2.INTER_AREA)
         obj.image = resized_image
-        obj.segmentation = [(int(point[0] * self.factor), int(point[1] * self.factor)) for point in obj.segmentation]
+        segmentation = obj.segmentation.astype(np.float32)
+        segmentation *= np.array(self.factor, dtype=np.float32)
+        obj.segmentation = segmentation.astype(np.int32)
+
         obj.bbox.coordinates = tuple(np.array(obj.bbox.coordinates) * self.factor)
 
 @register_transformation

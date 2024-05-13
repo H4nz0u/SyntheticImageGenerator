@@ -2,9 +2,9 @@ import cv2
 from image_management.object import ImgObject
 import numpy as np
 class Scene:
-    def __init__(self, background, foregrounds) -> None:
+    def __init__(self, background) -> None:
         self.background = background
-        self.foregrounds = foregrounds
+        self.foregrounds = []
         self.filters = []
     
     def add_filter(self, filter):
@@ -15,6 +15,7 @@ class Scene:
             filter.apply(self.background)
             
     def add_foreground(self, foreground: ImgObject):
+        self.foregrounds.append(foreground)
         position_x, position_y = 0.5, 0.5  # Center position by default
         obj_h, obj_w = foreground.image.shape[:2]
         background_h, background_w = self.background.shape[:2]

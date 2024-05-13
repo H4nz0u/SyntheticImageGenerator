@@ -30,7 +30,7 @@ def parse_voc_xml(file_path):
         return {
             'class': class_name,
             'bbox': {'x': xmin, 'y': ymin, 'width': width, 'height': height},
-            'segmentation': segmentation
+            'segmentation': np.array(segmentation, dtype=np.int32).reshape((-1, 1, 2))
         }
 
 if __name__ == "__main__":

@@ -20,8 +20,3 @@ scene:
 
 
 read about cleanlab
-
-
-today:
-    think of method to determine position of objects (at first maybe random but modular)
-    merge foreground objects with background
