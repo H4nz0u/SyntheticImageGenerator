@@ -1,6 +1,7 @@
 import cv2
 from image_management.object import ImgObject
 import numpy as np
+from object_position import BasePositionDeterminer
 class Scene:
     def __init__(self, background) -> None:
         self.background = background
@@ -12,11 +13,12 @@ class Scene:
     
     def apply_filter(self):
         for filter in self.filters:
-            filter.apply(self.background)
+            self.background = filter.apply(self.background)
             
     def add_foreground(self, foreground: ImgObject):
+        position_x, position_y = self.positionDeterminer.get_position(self.background, self.foregrounds)
+        
         self.foregrounds.append(foreground)
-        position_x, position_y = 0.5, 0.5  # Center position by default
         obj_h, obj_w = foreground.image.shape[:2]
         background_h, background_w = self.background.shape[:2]
 
@@ -55,3 +57,6 @@ class Scene:
         """self.image = cv2.polylines(
             car_image_with_sign, [self.signImage.bounding_box], True, (0, 255, 0), 2
         )"""
+
+    def configure_positioning(self, positionDeterminer: BasePositionDeterminer):
+        self.positionDeterminer = positionDeterminer

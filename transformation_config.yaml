@@ -1,20 +1,29 @@
 transformations:
   "Typlabel-China, Typlabel-USA": #could also be "all"
-    - "name": "Rotate"
-      "angle": 45
-    - "name": "Scale"
-      "factor": 0.5
+    - "name": "RandomRotate"
+      "min_angle": 0
+      "max_angle": 360
+    - "name": "RandomScale"
+      "min_factor": 0.5
+      "max_factor": 1
   "Typlabel-Japan":
     - "name": "Rotate"
       "angle": 90
     - "name": "Scale"
       "factor": 0.5
+  "Background":
+    - "name": "Zoom"
+      "zoom_factor": 1.5
 
 filters:
-  - "Brightness":
-    "factor": 0.5
+  - "name": "Brightness"
+    "brightness_factor": 1.2
 
 blending: "Standard"
+
+positioning: 
+  "name": "RandomPositionDeterminer"
+  "bounds": [0, 1, 0, 1]
 
 total_images: 20
 seed: 42

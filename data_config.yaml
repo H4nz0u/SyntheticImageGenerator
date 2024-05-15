@@ -1,6 +1,6 @@
 root_path: images/
 background_folder: cars/
 foreground_objects:
-  Typlabel-China: signs/
-  Typlabel-USA: signs/
-  Typlabel-Japan: signs/
+  Typlabel-China: ISI-Typlabelchina-Schilder/
+  Typlabel-USA: ISI-Typlabelchina-Schilder/
+  Typlabel-Japan: ISI-Typlabelchina-Schilder/

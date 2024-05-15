@@ -25,17 +25,12 @@ class Scale(Transformation):
         obj.bbox.coordinates = tuple(np.array(obj.bbox.coordinates) * self.factor)
 
 @register_transformation
-class RandomScale(Transformation):
+class RandomScale(Scale):
     def __init__(self, min_factor, max_factor):
         self.min_factor = min_factor
         self.max_factor = max_factor
+        super().__init__(np.random.uniform(min_factor, max_factor))
         
     def apply(self, obj: ImgObject):
-        image = obj.image
-        factor = np.random.uniform(self.min_factor, self.max_factor)
-        new_width = int(image.shape[1] * factor)
-        new_height = int(image.shape[0] * factor)
-        
-        new_dim = (new_width, new_height)
-        resized_image = cv2.resize(image, new_dim, interpolation=cv2.INTER_AREA)
-        obj.image = resized_image
+        super().apply(obj)
+        self.factor = np.random.uniform(self.min_factor, self.max_factor)

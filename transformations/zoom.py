@@ -1,12 +1,12 @@
-from .base_filter import Filter, register_filter
-from image_management.image import Image
+from transformations import Transformation, register_transformation
+from image_management import ImgObject
 import cv2
 import numpy as np
-from random import random
+import random
 from typing import List
 
-@register_filter
-class Zoom(Filter):
+@register_transformation
+class Zoom(Transformation):
     def __init__(self, zoom_factor, zoom_position: List[float] = [0.5, 0.5]):
         self.zoom_factor = zoom_factor
         self.zoom_position = zoom_position
@@ -30,8 +30,8 @@ class Zoom(Filter):
         x1, y1 = Px - new_width // 2, Py - new_height // 2
         x2, y2 = Px + new_width // 2, Py + new_height // 2
         
-        x1, y1 = max(0, x1), max(0, y1)
-        x2, y2 = min(image_width, x2), min(image_height, y2)
+        x1, y1 = int(max(0, x1)), int(max(0, y1))
+        x2, y2 = int(min(image_width, x2)), int(min(image_height, y2))
         
         return Z, (x1, y1, x2, y2)
         

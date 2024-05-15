@@ -1,5 +1,7 @@
 import yaml
 from transformations import create_transformation, Transformation
+from filter import create_filter, Filter
+from object_position import create_positionDeterminer, BasePositionDeterminer
 from image_management import ImageDataLoader
 from typing import List
 import os
@@ -34,14 +36,15 @@ class Config:
         """Merge transformation settings into the data configuration for easy access."""
         self.config = {
             'transformations': self._parse_transformations(self.transform_config.get('transformations', {})),
-            'filters': self.transform_config.get('filters', {}),
+            'filters' : self._parse_filters(self.transform_config.get('filters', [])),
             'blending_mode': self.transform_config.get('blending_mode', 'Standard'),
             'total_images': self.transform_config.get('total_images', 20),
             'seed': self.transform_config.get('seed', 42),
             'object_counts': self.transform_config.get('object_amount', {}),
             'root_path': self.data_config.get('root_path', ''),
             'background_folder': os.path.join(self.data_config.get('root_path', ''), self.data_config.get('background_folder', '')),
-            'foreground_objects': {k: os.path.join(self.data_config.get('root_path', ''), v) for k, v in self.data_config.get('foreground_objects', {}).items()}
+            'foreground_objects': {k: os.path.join(self.data_config.get('root_path', ''), v) for k, v in self.data_config.get('foreground_objects', {}).items()},
+            'positioning': self._parse_positioning(self.transform_config.get('positioning', {}))
         }     
 
     def _validate_config(self):
@@ -52,7 +55,7 @@ class Config:
         
     def _validate_transformations(self):
         for label in self.config['transformations'].keys():
-            if not label in self.config["foreground_objects"].keys():
+            if not label in self.config["foreground_objects"].keys() and label != "Background":
                 raise ValueError(f'No path defined for label {label} in foreground_objects')
     
     def _validate_paths(self):
@@ -67,10 +70,14 @@ class Config:
         self._validate_image(self.config['background_folder'])
         for label, path in self.config['foreground_objects'].items():
             self._validate_image(path)
+            
     def _validate_image(self, path: str):
         images = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f.endswith('.png') or f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.JPG')]
         if not images:
             raise ValueError(f'No images found in {path}')
+    
+    def _parse_positioning(self, positioning: dict) -> BasePositionDeterminer:
+        return create_positionDeterminer(**positioning)
     
     def _parse_label(self, label: str) -> List[str]:
         if label == "all":
@@ -90,6 +97,14 @@ class Config:
         for label in transformations.keys():
             self._parse_transformation(label, transformations[label], transforms)    
         return transforms
+    
+    
+    def _parse_filters(self, filters: []) -> List[Filter]:
+        fil = []
+        for filter in filters:
+            fil.append(create_filter(**filter))
+        return fil
+            
         
     def _validate_path(self, path):
         if not os.path.exists(path):

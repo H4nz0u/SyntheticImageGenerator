@@ -75,27 +75,12 @@ class Rotate(Transformation):
         obj.bbox.coordinates = (new_x, new_y, new_w, new_h)
 
 @register_transformation
-class RandomRotate(Transformation):
+class RandomRotate(Rotate):
     def __init__(self, min_angle, max_angle):
         self.min_angle = min_angle
         self.max_angle = max_angle
+        super().__init__(np.random.randint(self.min_angle, self.max_angle))
         
     def apply(self, obj: ImgObject):
-        angle = np.random.randint(self.min_angle, self.max_angle)
-        image = obj.image
-        image_center = tuple(np.array(image.shape[1::-1]) / 2)
-        
-        height, width = image.shape[:2]
-        M = cv2.getRotationMatrix2D(image_center, angle, 1.0)
-        
-        cos = np.abs(M[0, 0])
-        sin = np.abs(M[0, 1])
-        
-        new_width = int((height * sin) + (width * cos))
-        new_height = int((height * cos) + (width * sin))
-        
-        M[0, 2] += (new_width / 2) - image_center[0]
-        M[1, 2] += (new_height / 2) - image_center[1]
-        
-        image = cv2.warpAffine(image, M, (new_width, new_height))
-        obj.image = image
+        super().apply(obj)
+        self.angle = np.random.randint(self.min_angle, self.max_angle)
