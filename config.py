@@ -35,6 +35,7 @@ class Config:
     def merge_configs(self):
         """Merge transformation settings into the data configuration for easy access."""
         self.config = {
+            'foreground_objects': {k: os.path.join(self.data_config.get('root_path', ''), v) for k, v in self.data_config.get('foreground_objects', {}).items()},
             'transformations': self._parse_transformations(self.transform_config.get('transformations', {})),
             'filters' : self._parse_filters(self.transform_config.get('filters', [])),
             'blending_mode': self.transform_config.get('blending_mode', 'Standard'),
@@ -43,7 +44,6 @@ class Config:
             'object_counts': self.transform_config.get('object_amount', {}),
             'root_path': self.data_config.get('root_path', ''),
             'background_folder': os.path.join(self.data_config.get('root_path', ''), self.data_config.get('background_folder', '')),
-            'foreground_objects': {k: os.path.join(self.data_config.get('root_path', ''), v) for k, v in self.data_config.get('foreground_objects', {}).items()},
             'positioning': self._parse_positioning(self.transform_config.get('positioning', {}))
         }     
 
@@ -81,7 +81,7 @@ class Config:
     
     def _parse_label(self, label: str) -> List[str]:
         if label == "all":
-            return list(self.config['foreground_objects'].keys())
+            return list(self.data_config['foreground_objects'].keys())
         return label.replace(" ", "").split(',')
     
     def _parse_transformation(self, label, transformations: dict, transforms: dict) -> Transformation:

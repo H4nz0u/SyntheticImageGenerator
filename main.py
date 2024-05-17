@@ -15,8 +15,9 @@ def main(data_config_path: Path, transformation_config_path: Path):
     background_dataloader = BackgroundDataLoader(config["background_folder"], seed=config["seed"])
     background = background_dataloader.get_image()
     
-    for transformation in config["transformations"]["Background"]:
-        background = transformation.apply(background)
+    if "Background" in config["transformations"].keys():
+        for transformation in config["transformations"]["Background"]:
+            background = transformation.apply(background)
     scene = Scene(background)
     scene.configure_positioning(config["positioning"])
 
