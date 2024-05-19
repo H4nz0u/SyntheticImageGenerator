@@ -6,6 +6,7 @@ from .object import ImgObject
 from typing import Dict, List, Tuple, Union
 from functools import lru_cache
 import cv2
+from utilities import logger
 
 class DataLoader:
     def __init__(self, root_path: str, seed: int = None) -> None:
@@ -39,15 +40,16 @@ class ImageDataLoader(DataLoader):
             obj = ImgObject(image_path, annotation_path)
             return obj
         except Exception as e:
-            print(f"Failed to construct object {image_path}: {str(e)}")
+            logger.error(f"Failed to construct object {image_path}: {str(e)}")
             return None
 
     def get_image(self, image_type: str) -> ImgObject:
         if image_type in self.objects:
             path = random.choice(self.object_image_paths[image_type])
-            print("foreground: ", path)
+            logger.info(f"foreground: {path}")
             return self._serve_object(path)
         else:
+            logger.error(f"Type {image_type} not found in objects")
             raise KeyError(f"Type {image_type} not found in objects")
 
 
@@ -62,4 +64,5 @@ class BackgroundDataLoader(DataLoader):
 
     def get_image(self) -> ImgObject:
         path = random.choice(self.background_image_paths)
+        logger.info(f"background: {path}")
         return self._serve_background(path)

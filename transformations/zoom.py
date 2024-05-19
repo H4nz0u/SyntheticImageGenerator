@@ -1,4 +1,5 @@
-from transformations import Transformation, register_transformation
+from transformations import Transformation
+from utilities import register_transformation
 from image_management import ImgObject
 import cv2
 import numpy as np

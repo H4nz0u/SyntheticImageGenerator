@@ -1,5 +1,3 @@
 from .base_position import BasePositionDeterminer
-from .position_registry import register_positionDeterminer
-from .position_factory import create_positionDeterminer
 from .center import CenterPositionDeterminer
 from .random_position import RandomPositionDeterminer

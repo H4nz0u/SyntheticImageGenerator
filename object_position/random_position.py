@@ -1,7 +1,7 @@
 from . import BasePositionDeterminer
 from typing import List
 import random
-from .position_registry import register_positionDeterminer
+from utilities import register_positionDeterminer
 
 @register_positionDeterminer
 class RandomPositionDeterminer(BasePositionDeterminer):

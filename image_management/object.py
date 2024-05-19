@@ -32,6 +32,7 @@ class ImgObject:
         mask = np.zeros(self.image.shape[:2], dtype=np.uint8)
         cv2.drawContours(mask, [self.segmentation], -1, 255, thickness=cv2.FILLED)
 
+
         """
         # Combine the mask creation
         black_mask = np.all(self.image == [0, 0, 0], axis=-1)

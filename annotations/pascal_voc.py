@@ -1,22 +1,16 @@
 from lxml import etree
 from typing import List, Tuple, Dict
+import os
+from . import BaseAnnotator
+from utilities import register_annotation
 
-class PascalVOCAnnotations:
-    def __init__(self, filename: str, original_path: str, size: Tuple[int, int, int]):
+@register_annotation
+class PascalVOC(BaseAnnotator):
+    def __init__(self):
+        super().__init__()
         self.root = etree.Element('annotation')
         self.objects = list()
-        filename_element = etree.SubElement(self.root, 'filename')
-        filename_element.text = filename
-        original_path_element = etree.SubElement(self.root, 'original_path')
-        original_path_element.text = original_path
-        size_element = etree.SubElement(self.root, 'size')
-        w, h, d = size
-        depth = etree.SubElement(size_element, 'depth')
-        depth.text = str(d)
-        width = etree.SubElement(size_element, 'width')
-        width.text = str(w)
-        height = etree.SubElement(size_element, 'height')
-        height.text = str(h)
+
         segmented = etree.SubElement(self.root, 'segmented')
         segmented.text = '1'
         
@@ -25,9 +19,8 @@ class PascalVOCAnnotations:
         object_element = etree.SubElement(self.root, 'object')
         bb_element = self._get_bb_subtree(bb)
         object_element.append(bb_element)
-        etree.SubElement(object_element, 'cadmodelname')
         object_id = etree.SubElement(object_element, 'id')
-        object_id.text = str(len(self.objects+1))
+        object_id.text = str(len(self.objects)+1)
         name = etree.SubElement(object_element, 'name')
         name.text = class_label
         etree.SubElement(object_element, 'partId')
@@ -49,7 +42,20 @@ class PascalVOCAnnotations:
     def has_detection(self):
         return bool(len(self.root.findall('object')))
     
-    def write_xml(self, output_path: str):
+    def set_size(self, size: Tuple[int, int, int]):
+        size_element = etree.SubElement(self.root, 'size')
+        w, h, d = size
+        depth = etree.SubElement(size_element, 'depth')
+        depth.text = str(d)
+        width = etree.SubElement(size_element, 'width')
+        width.text = str(w)
+        height = etree.SubElement(size_element, 'height')
+        height.text = str(h)
+    
+    def write_xml(self, output_path: str, size: Tuple[int, int, int]):
+        self.set_size(size)
+        filename_element = etree.SubElement(self.root, 'filename')
+        filename_element.text = os.path.basename(output_path)
         tree = etree.ElementTree(self.root)
         tree.write(output_path, pretty_print=True, xml_declaration=True, encoding='utf-8')
         

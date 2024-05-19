@@ -4,3 +4,5 @@ foreground_objects:
   Typlabel-China: ISI-Typlabelchina-Schilder/
   Typlabel-USA: ISI-Typlabelchina-Schilder/
   Typlabel-Japan: ISI-Typlabelchina-Schilder/
+annotation: PascalVOC
+size: [2304, 1728]

@@ -11,6 +11,8 @@ transformations:
       "angle": 90
     - "name": "Scale"
       "factor": 0.5
+    - "name": "Shear"
+      "shear_factor": 0.5
   "Background":
     - "name": "Zoom"
       "zoom_factor": 1.5
@@ -28,6 +30,6 @@ positioning:
 total_images: 20
 seed: 42
 object_amount: 
-  "Typlabel-China": 2
+  "Typlabel-China": 1
   "Typlabel-USA": 1
-  "Typlabel-Japan": 3
+  "Typlabel-Japan": 1

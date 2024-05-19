@@ -1,5 +1,5 @@
 from .base_transform import Transformation
-from .transformation_registry import register_transformation
+from utilities import register_transformation, logger
 from image_management import ImgObject
 import cv2
 import numpy as np
@@ -10,6 +10,7 @@ class Scale(Transformation):
         self.factor = factor
         
     def apply(self, obj: ImgObject):
+        logger.info(f'Scaling image by {self.factor}')
         image = obj.image
         new_width = int(image.shape[1] * self.factor)
         new_height = int(image.shape[0] * self.factor)
@@ -21,8 +22,8 @@ class Scale(Transformation):
         segmentation = obj.segmentation.astype(np.float32)
         segmentation *= np.array(self.factor, dtype=np.float32)
         obj.segmentation = segmentation.astype(np.int32)
-
-        obj.bbox.coordinates = tuple(np.array(obj.bbox.coordinates) * self.factor)
+        obj.bbox.coordinates = np.array(obj.bbox.coordinates) * self.factor
+        logger.info(f'New BBox coordinates: {obj.bbox.coordinates}')
 
 @register_transformation
 class RandomScale(Scale):

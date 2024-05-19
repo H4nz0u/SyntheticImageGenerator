@@ -1,15 +1,16 @@
 from pathlib import Path
 from config import Config
 from image_management import ImageDataLoader, Scene, BackgroundDataLoader, ImgObject
-from transformations import create_transformation, transformation_registry_dict
 import cv2
 import numpy as np
+from utilities import logger
 
 import cProfile
 import pstats
 import io
 
 def main(data_config_path: Path, transformation_config_path: Path):
+
     config = Config(".", transformation_config_path, data_config_path)
     dataloader = ImageDataLoader(".",  config["foreground_objects"], seed=config["seed"])
     background_dataloader = BackgroundDataLoader(config["background_folder"], seed=config["seed"])
@@ -33,6 +34,9 @@ def main(data_config_path: Path, transformation_config_path: Path):
     
     cv2.imshow("image", cv2.resize(scene.background, (800, 600)))
     cv2.waitKey(0)
+    scene.configure_annotator(config["annotator"])
+    scene.write("test.jpg", config["size"])
+    scene.show()
 
 def profile_main(data_config_path: str, transformation_config_path: str):
     pr = cProfile.Profile()

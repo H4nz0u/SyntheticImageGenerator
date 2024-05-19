@@ -1,4 +1,5 @@
-from filter import Filter, register_filter
+from filter import Filter
+from utilities import register_filter
 import cv2
 
 @register_filter

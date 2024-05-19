@@ -1,5 +1,5 @@
 from .base_transform import Transformation
-from .transformation_registry import register_transformation
+from utilities import register_transformation, logger
 from image_management import Image, ImgObject
 import cv2
 import numpy as np
@@ -10,6 +10,7 @@ class Rotate(Transformation):
         self.angle = angle
 
     def apply(self, obj: ImgObject):
+        logger.info(f'Rotating image by {self.angle} degrees')
         image = obj.image
         image_center = tuple(np.array(image.shape[1::-1]) / 2)
         
@@ -30,10 +31,11 @@ class Rotate(Transformation):
         obj.image = image
         self._transform_segmentation(obj, M, new_width, new_height)
         self._transform_bbox(obj, M)
+        logger.info(f'New BBox coordinates: {obj.bbox.coordinates}')
         self._transform_mask(obj, M, new_height, new_width)
+        
 
 
-    
     def _transform_mask(self, obj, M, new_height, new_width):
         mask = obj.mask
         # Ensure the mask is a single channel image

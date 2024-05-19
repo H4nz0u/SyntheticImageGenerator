@@ -1,9 +1,11 @@
 import yaml
-from transformations import create_transformation, Transformation
-from filter import create_filter, Filter
-from object_position import create_positionDeterminer, BasePositionDeterminer
+from transformations import Transformation
+from filter import Filter
+from object_position import BasePositionDeterminer
 from image_management import ImageDataLoader
+from utilities import create_transformation, create_positionDeterminer, create_filter, create_annotation, logger
 from typing import List
+from annotations import BaseAnnotator
 import os
 
 class Config:
@@ -16,7 +18,7 @@ class Config:
         try:
             self._validate_config()
         except Exception as e:
-            print(f'Error validating config: {e}')
+            logger.error(f'Error validating config: {e}')
             raise e
 
     def load_config(self, config_path: str):
@@ -26,10 +28,10 @@ class Config:
                 data = yaml.safe_load(file) or {}
                 return data
         except yaml.YAMLError as exc:
-            print(f"Error loading YAML file {config_path}: {exc}")
+            logger.error(f"Error loading YAML file {config_path}: {exc}")
             return {}
         except FileNotFoundError:
-            print(f"File not found: {config_path}")
+            logger.error(f"File not found: {config_path}")
             return {}
 
     def merge_configs(self):
@@ -44,7 +46,9 @@ class Config:
             'object_counts': self.transform_config.get('object_amount', {}),
             'root_path': self.data_config.get('root_path', ''),
             'background_folder': os.path.join(self.data_config.get('root_path', ''), self.data_config.get('background_folder', '')),
-            'positioning': self._parse_positioning(self.transform_config.get('positioning', {}))
+            'positioning': self._parse_positioning(self.transform_config.get('positioning', {})),
+            'size': self.data_config.get('size', (800, 600)),
+            'annotator': self._parse_annotation(self.data_config.get('annotation', None)),
         }     
 
     def _validate_config(self):
@@ -104,7 +108,9 @@ class Config:
         for filter in filters:
             fil.append(create_filter(**filter))
         return fil
-            
+    
+    def _parse_annotation(self, annotation: str) -> BaseAnnotator:
+        return create_annotation(annotation)
         
     def _validate_path(self, path):
         if not os.path.exists(path):
@@ -124,7 +130,7 @@ class Config:
             try:
                 yaml.dump(self.params, stream)
             except yaml.YAMLError as exc:
-                print(exc)
+                logger.error(exc)
     
     def get(self, key, default=None):
         return self.config.get(key, default)

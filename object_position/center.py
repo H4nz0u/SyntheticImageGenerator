@@ -1,5 +1,5 @@
 from . import BasePositionDeterminer
-from .position_registry import register_positionDeterminer
+from utilities.registry import register_positionDeterminer
 
 @register_positionDeterminer
 class CenterPositionDeterminer(BasePositionDeterminer):
