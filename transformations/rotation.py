@@ -26,8 +26,7 @@ class Rotate(Transformation):
         M[0, 2] += (new_width / 2) - image_center[0]
         M[1, 2] += (new_height / 2) - image_center[1]
 
-        image = cv2.warpAffine(image, M, (new_width, new_height))
-
+        image = cv2.warpAffine(image, M, (new_width, new_height), flags=cv2.INTER_NEAREST)
         obj.image = image
         self._transform_segmentation(obj, M, new_width, new_height)
         self._transform_bbox(obj, M)

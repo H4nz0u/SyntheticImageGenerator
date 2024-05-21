@@ -1,18 +1,11 @@
 transformations:
-  "Typlabel-China, Typlabel-USA": #could also be "all"
-    - "name": "RandomRotate"
-      "min_angle": 0
-      "max_angle": 360
-    - "name": "RandomScale"
-      "min_factor": 0.5
-      "max_factor": 1
   "Typlabel-Japan":
     - "name": "Rotate"
-      "angle": 90
+      "angle": 45
     - "name": "Scale"
-      "factor": 0.5
-    - "name": "Shear"
-      "shear_factor": 0.5
+      "factor": 0.9
+    #- "name": "ShearY"
+    #  "shear_factor": 0.5
   "Background":
     - "name": "Zoom"
       "zoom_factor": 1.5
@@ -30,6 +23,4 @@ positioning:
 total_images: 20
 seed: 42
 object_amount: 
-  "Typlabel-China": 1
-  "Typlabel-USA": 1
   "Typlabel-Japan": 1

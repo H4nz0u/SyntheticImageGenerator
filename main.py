@@ -31,12 +31,9 @@ def main(data_config_path: Path, transformation_config_path: Path):
     
     scene.filters = config["filters"]
     scene.apply_filter()
-    
-    cv2.imshow("image", cv2.resize(scene.background, (800, 600)))
-    cv2.waitKey(0)
     scene.configure_annotator(config["annotator"])
     scene.write("test.jpg", config["size"])
-    scene.show()
+    scene.show(show_mask=False)
 
 def profile_main(data_config_path: str, transformation_config_path: str):
     pr = cProfile.Profile()
