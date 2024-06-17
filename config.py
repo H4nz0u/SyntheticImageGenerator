@@ -120,10 +120,16 @@ class Config:
         for label in self.config["foreground_objects"].keys():
             if not label in self.config["object_counts"].keys():
                 raise ValueError(f'No object count defined for label {label} in object_counts')
-            if not isinstance(self.config["object_counts"][label], int):
-                raise ValueError(f'Object count for label {label} is not an integer')
-            if self.config["object_counts"][label] < 0:
-                raise ValueError(f'Object count for label {label} is negative')
+            if not isinstance(self.config["object_counts"][label]["max"], int):
+                raise ValueError(f'Object count for label {label} is not an integer! {self.config["object_counts"][label]}')
+            if self.config["object_counts"][label]["max"] < 0:
+                raise ValueError(f'Object count for label {label} is negative! {self.config["object_counts"][label]}')
+            if self.config["object_counts"][label]["max"] == 0:
+                raise ValueError(f'Object count for label {label} is zero! {self.config["object_counts"][label]}')
+            if not isinstance(self.config["object_counts"][label]["prob"], float):
+                raise ValueError(f'Object probability for label {label} is not an float! {self.config["object_counts"][label]}')
+            if not 0 < self.config["object_counts"][label]["prob"] <= 1:
+                raise ValueError(f'Object probability for label {label} is not between 0 and 1! {self.config["object_counts"][label]}')
         
     def save_config(self, config_path):
         with open(config_path, 'w') as stream:

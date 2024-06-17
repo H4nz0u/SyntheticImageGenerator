@@ -4,14 +4,12 @@ from image_management import ImageDataLoader, Scene, BackgroundDataLoader, ImgOb
 import cv2
 import numpy as np
 from utilities import logger
-
+import random
 import cProfile
 import pstats
 import io
 
-def main(data_config_path: Path, transformation_config_path: Path):
-
-    config = Config(".", transformation_config_path, data_config_path)
+def generate_image(config: Config) -> Scene:
     dataloader = ImageDataLoader(".",  config["foreground_objects"], seed=config["seed"])
     background_dataloader = BackgroundDataLoader(config["background_folder"], seed=config["seed"])
     background = background_dataloader.get_image()
@@ -23,17 +21,24 @@ def main(data_config_path: Path, transformation_config_path: Path):
     scene.configure_positioning(config["positioning"])
 
     for object_label in config["foreground_objects"].keys():
-        for i in range(config["object_counts"].get(object_label, 0)):
-            image: ImgObject = dataloader.get_image(object_label)
-            image.apply_transformations(config["transformations"][object_label])
+        for i in range(config["object_counts"].get(object_label, 0)["max"]):
+            if random.random() < config["object_counts"].get(object_label, 0)["prob"]:
+                image: ImgObject = dataloader.get_image(object_label)
+                image.apply_transformations(config["transformations"][object_label])
         
-            scene.add_foreground(image)
+                scene.add_foreground(image)
     
     scene.filters = config["filters"]
     scene.apply_filter()
     scene.configure_annotator(config["annotator"])
+    return scene
+    
+def main(data_config_path: Path, transformation_config_path: Path):
+    config = Config(".", transformation_config_path, data_config_path)
+    scene = generate_image(config)
     scene.write("test.jpg", config["size"])
-    scene.show(show_mask=False)
+    scene.show(show_mask=True, show_bbox=False)
+    
 
 def profile_main(data_config_path: str, transformation_config_path: str):
     pr = cProfile.Profile()

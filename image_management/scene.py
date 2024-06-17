@@ -18,32 +18,17 @@ class Scene:
             self.background = filter.apply(self.background)
             
     def add_foreground(self, foreground: ImgObject):
-        position_x, position_y = self.positionDeterminer.get_position(self.background, self.foregrounds)
-        
         self.foregrounds.append(foreground)
-        obj_h, obj_w = foreground.image.shape[:2]  # Use original dimensions
-        background_h, background_w = self.background.shape[:2]
-
-        # Calculate insertion point based on determined position
-        x_start = int((background_w - obj_w) * position_x)
-        y_start = int((background_h - obj_h) * position_y)
-
-        # Ensure the insertion point keeps the entire object within the background
-        x_start = max(min(x_start, background_w - obj_w), 0)
-        y_start = max(min(y_start, background_h - obj_h), 0)
-
-        # Calculate end points, ensuring they do not exceed the background
-        x_end = min(x_start + obj_w, background_w)
-        y_end = min(y_start + obj_h, background_h)
-
+        x_start, y_start, x_end, y_end = self.positionDeterminer.get_position(self.background, self.foregrounds)
+        
         # Clipping dimensions if necessary
         clipped_width = x_end - x_start
         clipped_height = y_end - y_start
-
+        
         # Use clipped image regions
         clipped_image = foreground.image[:clipped_height, :clipped_width]
         clipped_mask = foreground.mask[:clipped_height, :clipped_width]
-
+        
         # Normalize and prepare mask for blending
         mask = clipped_mask.astype(np.float32) / 255.0
         mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR) if len(mask.shape) == 2 else mask
@@ -103,6 +88,7 @@ class Scene:
     def show_mask(self, display_image):
         for fg in self.foregrounds:
             x, y, w, h = fg.bbox.coordinates.astype(int)
+            print(display_image.shape)
             x = min(max(x, 0), display_image.shape[1] - 1)
             y = max(min(y, display_image.shape[0] - 1), 0)
             if hasattr(fg, 'mask'):
@@ -111,7 +97,8 @@ class Scene:
                 colored_mask = cv2.applyColorMap((resized_mask * 255).astype(np.uint8), cv2.COLORMAP_JET)
 
                 mask_position = display_image[y:y+h, x:x+w]
-
+                colored_mask = cv2.resize(colored_mask,(mask_position.shape[1], mask_position.shape[0]))
+                print(mask_position.shape, colored_mask.shape)
                 display_image[y:y+h, x:x+w] = cv2.addWeighted(mask_position, 0.5, colored_mask, 0.5, 0)
     
     def show_segmentation(self, display_image):

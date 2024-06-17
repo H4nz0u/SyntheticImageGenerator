@@ -3,7 +3,7 @@ transformations:
     - "name": "Rotate"
       "angle": 45
     - "name": "Scale"
-      "factor": 0.9
+      "factor": 0.4
     #- "name": "ShearY"
     #  "shear_factor": 0.5
   "Background":
@@ -17,10 +17,13 @@ filters:
 blending: "Standard"
 
 positioning: 
-  "name": "RandomPositionDeterminer"
+  "name": "RandomPositionNoCollisionDeterminer"
   "bounds": [0, 1, 0, 1]
+  "max_attempts": 1000
 
 total_images: 20
 seed: 42
 object_amount: 
-  "Typlabel-Japan": 1
+  "Typlabel-Japan":
+    "max": 3
+    "prob": 1.0
