@@ -3,16 +3,19 @@ transformations:
     - "name": "RandomShearY"
       "min_shear_factor": 0.4
       "max_shear_factor": 0.6
-    - "name": "RandomRotate"
-      "min_angle": 2.5
-      "max_angle": 7.5
+    - "name": "RotateFromDataFrame"
+      "dataframe_path": "/data/horse/ws/joka888b-syntheticImageGenerator/imageAnalysis/bbox_data.pkl"
+      "column_name": "angle"
     - "name": "RandomShearX"
       "min_shear_factor": 0.25
       "max_shear_factor": 0.38
-    - "name": "RandomScaleToArea"
-      "min_target_area_ratio": 0.12
-      "max_target_area_ratio": 0.22
-      "background_size": 3981312
+    #- "name": "RandomScaleToArea"
+    #  "min_target_area_ratio": 0.12
+    #  "max_target_area_ratio": 0.22
+    #  "background_size": 3981312
+    - "name": "ScaleFromDataFrame"
+      "dataframe_path": "/data/horse/ws/joka888b-syntheticImageGenerator/imageAnalysis/bbox_data.pkl"
+      "column_name": "angle"
   "Background":
     - "name": "Zoom"
       "zoom_factor": 1

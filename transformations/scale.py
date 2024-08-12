@@ -1,5 +1,5 @@
 from .base_transform import Transformation
-from utilities import register_transformation, logger
+from utilities import register_transformation, logger, get_cached_dataframe
 from image_management import ImgObject
 import cv2
 import numpy as np
@@ -60,4 +60,29 @@ class ScaleToArea(Scale):
 class RandomScaleToArea(ScaleToArea):
     def __init__(self, min_target_area_ratio: float, max_target_area_ratio: float, background_size: int):
         super().__init__(np.random.uniform(min_target_area_ratio, max_target_area_ratio), background_size)
-        
+
+@register_transformation
+class ScaleFromDataFrame(Scale):
+    def __init__(self, dataframe_path, column_name):
+        self.dataframe_path = dataframe_path
+        self.column_name = column_name
+        self.data = get_cached_dataframe(self.dataframe_path)
+        factor = 0
+        super().__init__(factor)
+
+    def _select_factor(self, cls):
+        try:
+            # Filter the DataFrame by the class
+            filtered_data = self.data[self.data['class'] == cls]
+            factor_values = filtered_data[self.column_name].dropna()
+            if len(factor_values) == 0:
+                raise ValueError(f"No valid factor values found for class '{cls}' in column '{self.column_name}'.")
+            return np.random.choice(factor_values)
+        except Exception as e:
+            logger.error(f"Failed to select an factor for class '{cls}': {e}")
+            raise
+
+    def apply(self, obj: ImgObject):
+        self.factor = self._select_factor(obj.cls)
+        logger.info(f'Applying Scaling using factor from DataFrame: {self.factor}')
+        super().apply(obj)

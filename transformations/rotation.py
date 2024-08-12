@@ -1,5 +1,5 @@
 from .base_transform import Transformation
-from utilities import register_transformation, logger
+from utilities import register_transformation, logger, get_cached_dataframe
 from image_management import Image, ImgObject
 import cv2
 import numpy as np
@@ -75,3 +75,30 @@ class RandomRotate(Rotate):
     def apply(self, obj: ImgObject):
         super().apply(obj)
         self.angle = np.random.randint(self.min_angle, self.max_angle)
+        
+@register_transformation
+class RotateFromDataFrame(Rotate):
+    def __init__(self, dataframe_path, column_name):
+        self.dataframe_path = dataframe_path
+        self.column_name = column_name
+        self.data = get_cached_dataframe(self.dataframe_path)
+        angle = 0
+        super().__init__(angle)
+
+    def _select_angle(self, cls):
+        try:
+            # Filter the DataFrame by the class
+            filtered_data = self.data[self.data['class'] == cls]
+            angle_values = filtered_data[self.column_name].dropna()
+            if len(angle_values) == 0:
+                raise ValueError(f"No valid angle values found for class '{cls}' in column '{self.column_name}'.")
+            # Sample one angle value from the distribution
+            return np.random.choice(angle_values)
+        except Exception as e:
+            logger.error(f"Failed to select an angle for class '{cls}': {e}")
+            raise
+
+    def apply(self, obj: ImgObject):
+        self.angle = self._select_angle(obj.cls)
+        logger.info(f'Applying rotation using an angle from DataFrame: {self.angle} degrees')
+        super().apply(obj)

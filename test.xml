@@ -3,10 +3,10 @@
   <segmented>1</segmented>
   <object>
     <bndbox>
-      <xmin>2298</xmin>
-      <ymin>149</ymin>
-      <xmax>3333</xmax>
-      <ymax>753</ymax>
+      <xmin>1184</xmin>
+      <ymin>710</ymin>
+      <xmax>3974</xmax>
+      <ymax>1675</ymax>
     </bndbox>
     <id>1</id>
     <name>Klimaschild-China</name>
@@ -14,23 +14,23 @@
     <segmentation>
       <point>
         <index>0</index>
-        <x>2298</x>
-        <y>149</y>
+        <x>1184</x>
+        <y>710</y>
       </point>
       <point>
         <index>1</index>
-        <x>2408</x>
-        <y>411</y>
+        <x>1612</x>
+        <y>1423</y>
       </point>
       <point>
         <index>2</index>
-        <x>3333</x>
-        <y>753</y>
+        <x>3974</x>
+        <y>1675</y>
       </point>
       <point>
         <index>3</index>
-        <x>3222</x>
-        <y>490</y>
+        <x>3545</x>
+        <y>962</y>
       </point>
     </segmentation>
   </object>
