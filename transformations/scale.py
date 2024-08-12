@@ -17,11 +17,13 @@ class Scale(Transformation):
         
         new_dim = (new_width, new_height)
         resized_image = cv2.resize(image, new_dim, interpolation=cv2.INTER_AREA)
-        obj.mask = cv2.resize(obj.mask, new_dim, interpolation=cv2.INTER_AREA)
+        if obj.mask.size > 0:
+            obj.mask = cv2.resize(obj.mask, new_dim, interpolation=cv2.INTER_AREA)
         obj.image = resized_image
-        segmentation = obj.segmentation.astype(np.float32)
-        segmentation *= np.array(self.factor, dtype=np.float32)
-        obj.segmentation = segmentation.astype(np.int32)
+        if obj.segmentation.size > 0:
+            segmentation = obj.segmentation.astype(np.float32)
+            segmentation *= np.array(self.factor, dtype=np.float32)
+            obj.segmentation = segmentation.astype(np.int32)
         obj.bbox.coordinates = np.array(obj.bbox.coordinates) * self.factor
         logger.info(f'New BBox coordinates: {obj.bbox.coordinates}')
 
@@ -35,3 +37,27 @@ class RandomScale(Scale):
     def apply(self, obj: ImgObject):
         super().apply(obj)
         self.factor = np.random.uniform(self.min_factor, self.max_factor)
+        
+@register_transformation
+class ScaleToArea(Scale):
+    def __init__(self, target_area_ratio: float, background_size: int):
+        self.target_area_ratio = target_area_ratio
+        self.background_size = background_size
+        
+    def apply(self, obj: ImgObject):
+        image = obj.image
+        obj_area = obj.bbox.area()
+        current_area_ratio = obj_area / self.background_size
+
+        if current_area_ratio > 0:
+            self.factor = np.sqrt(self.target_area_ratio / current_area_ratio)
+            logger.info(f'Scaling object to occupy {self.target_area_ratio * 100}% of the image area (factor: {self.factor})')
+            super().apply(obj)
+        else:
+            logger.warning('Object area is zero, skipping scaling.')
+            
+@register_transformation
+class RandomScaleToArea(ScaleToArea):
+    def __init__(self, min_target_area_ratio: float, max_target_area_ratio: float, background_size: int):
+        super().__init__(np.random.uniform(min_target_area_ratio, max_target_area_ratio), background_size)
+        

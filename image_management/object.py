@@ -20,31 +20,28 @@ class ImgObject:
             coordinates=(data['bbox']['x'], data['bbox']['y'], data['bbox']['width'], data['bbox']['height']),
             format_type="min_max"
         )
-        self.segmentation: np.array = data['segmentation']
+        segmentation = data.get("segmentation", None)
+        if not segmentation:
+            base = data["bbox"]
+            coordinates = [(base["x"], base["y"]), (base["x"], base["y"]+base["height"]), (base["x"]+base["width"], base["y"]+base["height"]), (base["x"]+base["width"], base["y"])]
+            self.segmentation = np.array(coordinates)
+        else:
+            self.segmentation: np.array = segmentation
         self.cls = data['class']
     
     def cut_out_object(self):
         x, y, w, h = self.bbox.coordinates
-        self.image = self.image[int(y):int(y)+int(h), int(x):int(x+w)]
-        self.segmentation -= np.array([x, y], dtype=np.int32)
-
-        # Create the mask only once
-        mask = np.zeros(self.image.shape[:2], dtype=np.uint8)
-        cv2.drawContours(mask, [self.segmentation], -1, 255, thickness=cv2.FILLED)
-
-
-        """
-        # Combine the mask creation
-        black_mask = np.all(self.image == [0, 0, 0], axis=-1)
-        self.image[black_mask] = (0, 255, 0)
-
-        black_mask = np.all(self.image == [0, 255, 0], axis=-1)
-        self.image[black_mask] = (0, 0, 0)
-        """
-        # Apply the mask to the image
-        self.image = cv2.bitwise_and(self.image, self.image, mask=mask)
-        self.mask = mask
-        self.bbox.coordinates = (0, 0, w, h)
+        self.image = self.image[int(y):int(y)+int(h), int(x):int(x)+int(w)]
+        
+        if self.segmentation.size > 0:
+            self.segmentation -= np.array([x, y], dtype=np.int32)
+            mask = np.zeros(self.image.shape[:2], dtype=np.uint8)
+            cv2.drawContours(mask, [self.segmentation], -1, 255, thickness=cv2.FILLED)
+            self.image = cv2.bitwise_and(self.image, self.image, mask=mask)
+            self.mask = mask
+        else:
+            self.mask = None  # No mask available if segmentation is not provided
+        self.bbox.coordinates = np.array([0, 0, w, h])
         
     def apply_transformations(self, transformations: List):
         for transformation in transformations:

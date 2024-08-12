@@ -4,23 +4,43 @@ from filter import Filter
 from object_position import BasePositionDeterminer
 from image_management import ImageDataLoader
 from utilities import create_transformation, create_positionDeterminer, create_filter, create_annotation, logger
-from typing import List
+from typing import List, Dict
 from annotations import BaseAnnotator
 import os
 
 class Config:
-    def __init__(self, base_path: str, transform_config_path: str, data_config_path: str):
-        self.base_path = base_path
-        self.transform_config = self.load_config(os.path.join(base_path, transform_config_path))
-        self.data_config = self.load_config(os.path.join(base_path, data_config_path))
-        self.config = {}
-        self.merge_configs()
-        try:
-            self._validate_config()
-        except Exception as e:
-            logger.error(f'Error validating config: {e}')
-            raise e
-
+    def __init__(self, 
+                 base_path: str = None, 
+                 transform_config_path: str = None, 
+                 data_config_path: str = None):
+        if base_path and transform_config_path and data_config_path:
+            self.base_path = base_path
+            self.transform_config = self.load_config(os.path.join(base_path, transform_config_path))
+            self.data_config = self.load_config(os.path.join(base_path, data_config_path))
+            self.config = {}
+            self.merge_configs()
+            try:
+                self._validate_config()
+            except Exception as e:
+                logger.error(f'Error validating config: {e}')
+                raise e
+        else:
+            self.config = {
+                'transformations': {},
+                'filters': [],
+                'blending_mode': 'Standard',
+                'positioning': None,
+                'foreground_objects': {
+                    "Typlabel-China": r"/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/images/ISI-Typlabelchina-Schilder/"
+                },
+                'background_folder': r'/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/images/cars/',
+                'root_path': r'/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/images/',
+                'object_counts': {"Typlabel-China": 1},
+                'seed': 42,
+                'total_images': 1,
+                'size': (800, 600),
+                'annotator': self._parse_annotation("PascalVOC")
+            }  
     def load_config(self, config_path: str):
         """Load a YAML configuration file and return a dictionary."""
         try:
@@ -140,6 +160,49 @@ class Config:
             raise KeyError(f'Key {key} not found in config')
         return self.config[key]
     
+    def set_transformations(self, transformations: Dict[str, List[float]]) -> None:
+        self.config['transformations'] = self._parse_transformations(transformations)
+
+    def set_filters(self, filters: List[Dict[str, float]]) -> None:
+        self.config['filters'] = self._parse_filters(filters)
+
+    def set_blending_mode(self, blending_mode: str) -> None:
+        self.config['blending_mode'] = blending_mode
+
+    def set_positioning(self, positioning: Dict) -> None:
+        self.config['positioning'] = create_positionDeterminer(**positioning)
+
+    def set_foreground_objects(self, foreground_objects: Dict[str, str]) -> None:
+        self.config['foreground_objects'] = {
+            k: os.path.join(self.config['root_path'], v) for k, v in foreground_objects.items()
+        }
+
+    def set_background_folder(self, background_folder: str) -> None:
+        self.config['background_folder'] = os.path.join(self.config['root_path'], background_folder)
+
+    def set_root_path(self, root_path: str) -> None:
+        self.config['root_path'] = root_path
+
+    def set_object_counts(self, object_counts: Dict[str, int]) -> None:
+        self.config['object_counts'] = object_counts
+
+    def _convert_to_dict(self):
+        config_dict = {
+            'transformations': {label: [t.__dict__ for t in trans] for label, trans in self.config['transformations'].items()},
+            'filters': [f.__dict__ for f in self.config['filters']],
+            'blending': self.config['blending_mode'],
+            'positioning': self.config['positioning'].__dict__ if self.config['positioning'] else None,
+            'total_images': self.config['total_images'],
+            'seed': self.config['seed'],
+            'object_amount': self.config['object_counts'],
+            'foreground_objects': self.config['foreground_objects'],
+            'background_folder': self.config['background_folder'],
+            'root_path': self.config['root_path'],
+            'size': self.config['size'],
+            'annotation': self.config['annotator'].__class__.__name__ if self.config['annotator'] else None
+        }
+        return config_dict
+
     def __str__(self):
         return str(self.config)
 

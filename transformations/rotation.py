@@ -26,14 +26,17 @@ class Rotate(Transformation):
         M[0, 2] += (new_width / 2) - image_center[0]
         M[1, 2] += (new_height / 2) - image_center[1]
 
-        image = cv2.warpAffine(image, M, (new_width, new_height), flags=cv2.INTER_NEAREST)
+        image = cv2.warpAffine(image, M, (new_width, new_height))
+
         obj.image = image
-        self._transform_segmentation(obj, M, new_width, new_height)
+        if obj.segmentation.size > 0:
+            self._transform_segmentation(obj, M, new_width, new_height)
         self._transform_bbox(obj, M)
         logger.info(f'New BBox coordinates: {obj.bbox.coordinates}')
-        self._transform_mask(obj, M, new_height, new_width)
-        
+        if obj.mask.size > 0:
+            self._transform_mask(obj, M, new_height, new_width)
 
+    
 
     def _transform_mask(self, obj, M, new_height, new_width):
         mask = obj.mask
@@ -60,20 +63,7 @@ class Rotate(Transformation):
         obj.segmentation = transformed_segmentation.astype(np.int32)
         
     def _transform_bbox(self, obj, M):
-        x, y, w, h = obj.bbox.coordinates
-        corners = np.array([
-            [x, y],
-            [x + w, y],
-            [x, y + h],
-            [x + w, y + h]
-        ])
-        corners_homogeneous = np.hstack([corners, np.ones((4, 1))])
-        transformed_corners = M @ corners_homogeneous.T
-        new_x = np.min(transformed_corners[0])
-        new_y = np.min(transformed_corners[1])
-        new_w = np.max(transformed_corners[0]) - new_x
-        new_h = np.max(transformed_corners[1]) - new_y
-        obj.bbox.coordinates = (new_x, new_y, new_w, new_h)
+        obj.bbox.coordinates = self.update_bbox_from_mask(obj.mask)
 
 @register_transformation
 class RandomRotate(Rotate):

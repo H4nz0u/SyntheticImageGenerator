@@ -8,9 +8,9 @@ from typing import List
 
 @register_transformation
 class Zoom(Transformation):
-    def __init__(self, zoom_factor, zoom_position: List[float] = [0.5, 0.5]):
+    def __init__(self, zoom_factor, zoom_position_x: float = 0.5, zoom_position_y: float = 0.5):
         self.zoom_factor = zoom_factor
-        self.zoom_position = zoom_position
+        self.zoom_position: List[float, float] = [zoom_position_x, zoom_position_y]
         
     def apply(self, image: cv2.typing.MatLike):
         zoom_factor, zoom_window = self.calculate_zoom_parameters(image)

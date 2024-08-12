@@ -1,26 +1,37 @@
 transformations:
-  "Typlabel-Japan":
-    - "name": "Rotate"
-      "angle": 45
-    - "name": "Scale"
-      "factor": 0.9
-    #- "name": "ShearY"
-    #  "shear_factor": 0.5
+  "Klimaschild-China":
+    - "name": "RandomShearY"
+      "min_shear_factor": 0.4
+      "max_shear_factor": 0.6
+    - "name": "RandomRotate"
+      "min_angle": 2.5
+      "max_angle": 7.5
+    - "name": "RandomShearX"
+      "min_shear_factor": 0.25
+      "max_shear_factor": 0.38
+    - "name": "RandomScaleToArea"
+      "min_target_area_ratio": 0.12
+      "max_target_area_ratio": 0.22
+      "background_size": 3981312
   "Background":
     - "name": "Zoom"
-      "zoom_factor": 1.5
+      "zoom_factor": 1
+      "zoom_position_x": 0.5
+      "zoom_position_y": 0.8
 
 filters:
-  - "name": "Brightness"
-    "brightness_factor": 1.2
+  - "name": "RandomTargetBrightness"
+    "min_brightness": 68
+    "max_brightness": 90
 
 blending: "Standard"
 
 positioning: 
-  "name": "RandomPositionDeterminer"
-  "bounds": [0, 1, 0, 1]
+  "name": "RandomPositionNoCollisionDeterminer"
+  "bounds": [0.6, 0.7, 0, 0.1]
+  "max_attempts": 100
 
 total_images: 20
 seed: 42
 object_amount: 
-  "Typlabel-Japan": 1
+  "Klimaschild-China": 1

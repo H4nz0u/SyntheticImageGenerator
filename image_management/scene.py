@@ -4,10 +4,11 @@ import numpy as np
 from object_position import BasePositionDeterminer
 from annotations import BaseAnnotator
 import os
+from typing import List
 class Scene:
     def __init__(self, background) -> None:
         self.background = background
-        self.foregrounds = []
+        self.foregrounds: List[ImgObject] = []
         self.filters = []
     
     def add_filter(self, filter):
@@ -18,23 +19,8 @@ class Scene:
             self.background = filter.apply(self.background)
             
     def add_foreground(self, foreground: ImgObject):
-        position_x, position_y = self.positionDeterminer.get_position(self.background, self.foregrounds)
-        
         self.foregrounds.append(foreground)
-        obj_h, obj_w = foreground.image.shape[:2]  # Use original dimensions
-        background_h, background_w = self.background.shape[:2]
-
-        # Calculate insertion point based on determined position
-        x_start = int((background_w - obj_w) * position_x)
-        y_start = int((background_h - obj_h) * position_y)
-
-        # Ensure the insertion point keeps the entire object within the background
-        x_start = max(min(x_start, background_w - obj_w), 0)
-        y_start = max(min(y_start, background_h - obj_h), 0)
-
-        # Calculate end points, ensuring they do not exceed the background
-        x_end = min(x_start + obj_w, background_w)
-        y_end = min(y_start + obj_h, background_h)
+        x_start, y_start, x_end, y_end = self.positionDeterminer.get_position(self.background, self.foregrounds)        
 
         # Clipping dimensions if necessary
         clipped_width = x_end - x_start
@@ -42,21 +28,27 @@ class Scene:
 
         # Use clipped image regions
         clipped_image = foreground.image[:clipped_height, :clipped_width]
-        clipped_mask = foreground.mask[:clipped_height, :clipped_width]
+        if foreground.mask is not None:
+            clipped_mask = foreground.mask[:clipped_height, :clipped_width]
 
-        # Normalize and prepare mask for blending
-        mask = clipped_mask.astype(np.float32) / 255.0
-        mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR) if len(mask.shape) == 2 else mask
+            # Normalize and prepare mask for blending
+            mask = clipped_mask.astype(np.float32) / 255.0
+            mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR) if len(mask.shape) == 2 else mask
 
-        # Retrieve ROI from the background
-        roi = self.background[y_start:y_end, x_start:x_end]
+            # Retrieve ROI from the background
+            roi = self.background[y_start:y_end, x_start:x_end]
 
-        # Blend the clipped foreground onto the background
-        self.background[y_start:y_end, x_start:x_end] = roi * (1 - mask) + clipped_image * mask
+            # Blend the clipped foreground onto the background
+            self.background[y_start:y_end, x_start:x_end] = roi * (1 - mask) + clipped_image * mask
+
+            foreground.mask = mask
+        else:
+            # Simply place the clipped image if no mask is provided
+            self.background[y_start:y_end, x_start:x_end] = clipped_image
 
         foreground.bbox.coordinates += np.array([x_start, y_start, 0, 0])
-        foreground.segmentation += np.array([x_start, y_start])
-        foreground.mask = mask
+        if foreground.segmentation is not None:
+            foreground.segmentation += np.array([x_start, y_start])
 
 
     def configure_positioning(self, positionDeterminer: BasePositionDeterminer):
@@ -72,7 +64,12 @@ class Scene:
             file_ending = filename.split(".")[-1]
             xml_path = path.replace(file_ending, "xml")
             for obj in self.foregrounds:
-                self.annotator.append_object(obj.segmentation, obj.cls)
+                if obj.segmentation.size > 0:
+                    self.annotator.append_object(obj.segmentation, obj.cls)
+                else:
+                    c = obj.bbox.coordinates
+                    bbox_coordinates = np.array([(c[0],c[1]), (c[0]+c[2], c[1]), (c[0]+c[2], c[1]+c[3]), (c[0], c[1]+c[3])])
+                    self.annotator.append_object(bbox_coordinates, obj.cls)
             self.annotator.write_xml(xml_path, image.shape)
         cv2.imwrite(path, image)
 
@@ -88,9 +85,10 @@ class Scene:
         if show_class:
             self.show_class(display_image)
 
-        cv2.imshow("Scene with Annotations", cv2.resize(display_image, (800, 600)))
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        #cv2.imshow("Scene with Annotations", cv2.resize(display_image, (800, 600)))
+        cv2.imwrite("test_visualization.jpg", cv2.resize(display_image, (2000, 1500)))
+        #cv2.waitKey(0)
+        #cv2.destroyAllWindows()
 
     def show_bbox(self, display_image):
         for fg in self.foregrounds:

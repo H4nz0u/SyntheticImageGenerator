@@ -4,14 +4,13 @@ from image_management import ImageDataLoader, Scene, BackgroundDataLoader, ImgOb
 import cv2
 import numpy as np
 from utilities import logger
-
+import faulthandler
+faulthandler.enable()
 import cProfile
 import pstats
 import io
 
-def main(data_config_path: Path, transformation_config_path: Path):
-
-    config = Config(".", transformation_config_path, data_config_path)
+def generate_image(config: Config):
     dataloader = ImageDataLoader(".",  config["foreground_objects"], seed=config["seed"])
     background_dataloader = BackgroundDataLoader(config["background_folder"], seed=config["seed"])
     background = background_dataloader.get_image()
@@ -34,6 +33,13 @@ def main(data_config_path: Path, transformation_config_path: Path):
     scene.configure_annotator(config["annotator"])
     scene.write("test.jpg", config["size"])
     scene.show(show_mask=False)
+    bboxes = [fg.bbox.coordinates.astype(int) for fg in scene.foregrounds]
+    coordinates = np.array([[bbox[0], bbox[1], bbox[0]+bbox[2], bbox[1]+bbox[3]] for bbox in bboxes])
+    return scene.background, coordinates, scene.annotator
+
+def main(data_config_path: Path, transformation_config_path: Path):
+    config = Config(".", transformation_config_path, data_config_path)
+    generate_image(config)
 
 def profile_main(data_config_path: str, transformation_config_path: str):
     pr = cProfile.Profile()
@@ -50,4 +56,4 @@ def profile_main(data_config_path: str, transformation_config_path: str):
     
 if __name__ == "__main__":
     #profile_main('data_config.yaml', 'transformation_config.yaml')
-    main('data_config.yaml', 'transformation_config.yaml')
+    main('/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/data_config.yaml', '/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/transformation_config.yaml')

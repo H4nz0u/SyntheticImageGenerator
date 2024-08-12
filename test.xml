@@ -3,214 +3,34 @@
   <segmented>1</segmented>
   <object>
     <bndbox>
-      <xmin>567</xmin>
-      <ymin>60</ymin>
-      <xmax>3986</xmax>
-      <ymax>3497</ymax>
+      <xmin>2298</xmin>
+      <ymin>149</ymin>
+      <xmax>3333</xmax>
+      <ymax>753</ymax>
     </bndbox>
     <id>1</id>
-    <name>Typlabel-China</name>
+    <name>Klimaschild-China</name>
     <partId/>
     <segmentation>
       <point>
         <index>0</index>
-        <x>610</x>
-        <y>2359</y>
+        <x>2298</x>
+        <y>149</y>
       </point>
       <point>
         <index>1</index>
-        <x>585</x>
-        <y>2387</y>
+        <x>2408</x>
+        <y>411</y>
       </point>
       <point>
         <index>2</index>
-        <x>576</x>
-        <y>2409</y>
+        <x>3333</x>
+        <y>753</y>
       </point>
       <point>
         <index>3</index>
-        <x>569</x>
-        <y>2430</y>
-      </point>
-      <point>
-        <index>4</index>
-        <x>567</x>
-        <y>2452</y>
-      </point>
-      <point>
-        <index>5</index>
-        <x>569</x>
-        <y>2468</y>
-      </point>
-      <point>
-        <index>6</index>
-        <x>572</x>
-        <y>2484</y>
-      </point>
-      <point>
-        <index>7</index>
-        <x>578</x>
-        <y>2501</y>
-      </point>
-      <point>
-        <index>8</index>
-        <x>585</x>
-        <y>2513</y>
-      </point>
-      <point>
-        <index>9</index>
-        <x>596</x>
-        <y>2527</y>
-      </point>
-      <point>
-        <index>10</index>
-        <x>1538</x>
-        <y>3472</y>
-      </point>
-      <point>
-        <index>11</index>
-        <x>1560</x>
-        <y>3487</y>
-      </point>
-      <point>
-        <index>12</index>
-        <x>1588</x>
-        <y>3497</y>
-      </point>
-      <point>
-        <index>13</index>
-        <x>1604</x>
-        <y>3497</y>
-      </point>
-      <point>
-        <index>14</index>
-        <x>1623</x>
-        <y>3495</y>
-      </point>
-      <point>
-        <index>15</index>
-        <x>1641</x>
-        <y>3491</y>
-      </point>
-      <point>
-        <index>16</index>
-        <x>1659</x>
-        <y>3486</y>
-      </point>
-      <point>
-        <index>17</index>
-        <x>1683</x>
-        <y>3473</y>
-      </point>
-      <point>
-        <index>18</index>
-        <x>2909</x>
-        <y>2232</y>
-      </point>
-      <point>
-        <index>19</index>
-        <x>3962</x>
-        <y>1156</y>
-      </point>
-      <point>
-        <index>20</index>
-        <x>3973</x>
-        <y>1135</y>
-      </point>
-      <point>
-        <index>21</index>
-        <x>3982</x>
-        <y>1111</y>
-      </point>
-      <point>
-        <index>22</index>
-        <x>3985</x>
-        <y>1098</y>
-      </point>
-      <point>
-        <index>23</index>
-        <x>3986</x>
-        <y>1085</y>
-      </point>
-      <point>
-        <index>24</index>
-        <x>3985</x>
-        <y>1072</y>
-      </point>
-      <point>
-        <index>25</index>
-        <x>3981</x>
-        <y>1062</y>
-      </point>
-      <point>
-        <index>26</index>
-        <x>3979</x>
-        <y>1047</y>
-      </point>
-      <point>
-        <index>27</index>
-        <x>3974</x>
-        <y>1035</y>
-      </point>
-      <point>
-        <index>28</index>
-        <x>3955</x>
-        <y>1009</y>
-      </point>
-      <point>
-        <index>29</index>
-        <x>3388</x>
-        <y>457</y>
-      </point>
-      <point>
-        <index>30</index>
-        <x>3004</x>
-        <y>83</y>
-      </point>
-      <point>
-        <index>31</index>
-        <x>2986</x>
-        <y>72</y>
-      </point>
-      <point>
-        <index>32</index>
-        <x>2972</x>
-        <y>65</y>
-      </point>
-      <point>
-        <index>33</index>
-        <x>2954</x>
-        <y>62</y>
-      </point>
-      <point>
-        <index>34</index>
-        <x>2938</x>
-        <y>60</y>
-      </point>
-      <point>
-        <index>35</index>
-        <x>2918</x>
-        <y>60</y>
-      </point>
-      <point>
-        <index>36</index>
-        <x>2897</x>
-        <y>65</y>
-      </point>
-      <point>
-        <index>37</index>
-        <x>2872</x>
-        <y>76</y>
-      </point>
-      <point>
-        <index>38</index>
-        <x>2846</x>
-        <y>99</y>
-      </point>
-      <point>
-        <index>39</index>
-        <x>1595</x>
-        <y>1354</y>
+        <x>3222</x>
+        <y>490</y>
       </point>
     </segmentation>
   </object>

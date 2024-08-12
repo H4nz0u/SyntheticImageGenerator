@@ -13,7 +13,7 @@ class DataLoader:
         self.root_path = root_path
     
     def _get_image_paths_for_type(self, path: str) -> List[str]:
-        image_types = ["jpg", "png", "jpeg"]
+        image_types = ["jpg", "png", "jpeg", "JPG"]
         return [file for ext in image_types for file in glob.glob(os.path.join(path, f"*.{ext}"))]
 
     def get_image(self) -> Union[ImgObject,cv2.typing.MatLike]:

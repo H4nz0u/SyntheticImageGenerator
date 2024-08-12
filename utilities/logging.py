@@ -27,7 +27,7 @@ def setup_logging():
 
     # Set level for handlers
     c_handler.setLevel(logging.DEBUG)  # Console only shows warning and above by default
-    f_handler.setLevel(logging.DEBUG)  # File logs everything
+    f_handler.setLevel(logging.ERROR)  # File logs everything
 
     # Add handlers to the logger
     logger.addHandler(c_handler)

@@ -1,8 +1,8 @@
-root_path: images/
+root_path: /data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/images/
 background_folder: cars/
 foreground_objects:
   #Typlabel-China: ISI-Typlabelchina-Schilder/
   #Typlabel-USA: ISI-Typlabelchina-Schilder/
-  Typlabel-Japan: ISI-Typlabelchina-Schilder/
+  Klimaschild-China: sorted_warped_images_with_xml/Klimaschild-China/
 annotation: PascalVOC
 size: [2304, 1728]
