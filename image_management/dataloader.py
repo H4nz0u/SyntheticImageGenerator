@@ -41,7 +41,7 @@ class ImageDataLoader(DataLoader):
             return obj
         except Exception as e:
             logger.error(f"Failed to construct object {image_path}: {str(e)}")
-            return None
+            raise e
 
     def get_image(self, image_type: str) -> ImgObject:
         if image_type in self.objects:

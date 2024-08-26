@@ -78,3 +78,14 @@ class PascalVOC(BaseAnnotator):
             element = etree.SubElement(bb_element, text)
             element.text = str(value)
         return bb_element
+    
+    def __getstate__(self):
+        # Convert the root element to a string for pickling
+        state = self.__dict__.copy()
+        state['root'] = etree.tostring(self.root)
+        return state
+
+    def __setstate__(self, state):
+        # Convert the string back to an element after unpickling
+        self.__dict__.update(state)
+        self.root = etree.fromstring(state['root'])

@@ -21,7 +21,8 @@ class ImgObject:
             format_type="min_max"
         )
         segmentation = data.get("segmentation", None)
-        if not segmentation:
+        
+        if segmentation is None or segmentation.size == 0:
             base = data["bbox"]
             coordinates = [(base["x"], base["y"]), (base["x"], base["y"]+base["height"]), (base["x"]+base["width"], base["y"]+base["height"]), (base["x"]+base["width"], base["y"])]
             self.segmentation = np.array(coordinates)
@@ -33,7 +34,7 @@ class ImgObject:
         x, y, w, h = self.bbox.coordinates
         self.image = self.image[int(y):int(y)+int(h), int(x):int(x)+int(w)]
         
-        if self.segmentation.size > 0:
+        if self.segmentation is not None and self.segmentation.size > 0:
             self.segmentation -= np.array([x, y], dtype=np.int32)
             mask = np.zeros(self.image.shape[:2], dtype=np.uint8)
             cv2.drawContours(mask, [self.segmentation], -1, 255, thickness=cv2.FILLED)

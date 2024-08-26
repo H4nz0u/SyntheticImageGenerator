@@ -1,40 +1,39 @@
 transformations:
   "Klimaschild-China":
-    - "name": "RandomShearY"
-      "min_shear_factor": 0.4
-      "max_shear_factor": 0.6
-    - "name": "RotateFromDataFrame"
-      "dataframe_path": "/data/horse/ws/joka888b-syntheticImageGenerator/imageAnalysis/bbox_data.pkl"
-      "column_name": "angle"
-    - "name": "RandomShearX"
-      "min_shear_factor": 0.25
-      "max_shear_factor": 0.38
-    #- "name": "RandomScaleToArea"
-    #  "min_target_area_ratio": 0.12
-    #  "max_target_area_ratio": 0.22
-    #  "background_size": 3981312
-    - "name": "ScaleFromDataFrame"
-      "dataframe_path": "/data/horse/ws/joka888b-syntheticImageGenerator/imageAnalysis/bbox_data.pkl"
-      "column_name": "angle"
-  "Background":
-    - "name": "Zoom"
-      "zoom_factor": 1
-      "zoom_position_x": 0.5
-      "zoom_position_y": 0.8
+    - "name": "AffineTransformationFromDataFrame"
+      "dataframe_path": "standard"
+    - "name": "ScaleToAreaFromDataFrame"
+      "dataframe_path": "standard"
+      "background_size": 3981312
+
+#    - "name": "Greyscale"
+#    - "name": "ShearYFromDataFrame"
+#      "dataframe_path": "standard"
+#    - "name": "RotateFromDataFrame"
+#      "dataframe_path": "standard"
+#    - "name": "ShearXFromDataFrame"
+#      "dataframe_path": "standard"
+#    - "name": "ScaleToAreaFromDataFrame"
+#      "dataframe_path": "standard"
+#      "background_size": 3981312
+#  "Background":
+#    - "name": "Zoom"
+#      "zoom_factor": 1
+#      "zoom_position_x": 0.5
+#      "zoom_position_y": 0.8
 
 filters:
-  - "name": "RandomTargetBrightness"
-    "min_brightness": 68
-    "max_brightness": 90
+  - "name": "TargetBrightnessFromDataFrame"
+    "dataframe_path": "standard"
+    "class_name": "Klimaschild-China"
 
 blending: "Standard"
 
 positioning: 
-  "name": "RandomPositionNoCollisionDeterminer"
-  "bounds": [0.6, 0.7, 0, 0.1]
-  "max_attempts": 100
+  "name": "DataframePositionDeterminer"
+  "dataframe_path": "standard"
 
-total_images: 20
+total_images: 1000
 seed: 42
 object_amount: 
   "Klimaschild-China": 1

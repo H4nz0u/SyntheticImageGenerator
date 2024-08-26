@@ -1,8 +1,10 @@
 root_path: /data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/images/
-background_folder: cars/
+background_folder: backgrounds_dataset_GMD/
 foreground_objects:
   #Typlabel-China: ISI-Typlabelchina-Schilder/
   #Typlabel-USA: ISI-Typlabelchina-Schilder/
-  Klimaschild-China: sorted_warped_images_with_xml/Klimaschild-China/
+  Klimaschild-China: manually_cut_out_signs/Klimaschild-China/
 annotation: PascalVOC
+dataframes:
+  "standard": /data/horse/ws/joka888b-syntheticImageGenerator/imageAnalysis/bbox_data.pkl
 size: [2304, 1728]

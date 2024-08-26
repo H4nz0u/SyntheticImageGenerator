@@ -3,7 +3,7 @@ from transformations import Transformation
 from filter import Filter
 from object_position import BasePositionDeterminer
 from image_management import ImageDataLoader
-from utilities import create_transformation, create_positionDeterminer, create_filter, create_annotation, logger
+from utilities import create_transformation, create_positionDeterminer, create_filter, create_annotation, logger, get_cached_dataframe
 from typing import List, Dict
 from annotations import BaseAnnotator
 import os
@@ -18,7 +18,9 @@ class Config:
             self.transform_config = self.load_config(os.path.join(base_path, transform_config_path))
             self.data_config = self.load_config(os.path.join(base_path, data_config_path))
             self.config = {}
+            self._load_dataframes()
             self.merge_configs()
+            
             try:
                 self._validate_config()
             except Exception as e:
@@ -144,6 +146,11 @@ class Config:
                 raise ValueError(f'Object count for label {label} is not an integer')
             if self.config["object_counts"][label] < 0:
                 raise ValueError(f'Object count for label {label} is negative')
+            
+    def _load_dataframes(self):
+        self.dataframes = {}
+        for name, path in self.data_config.get("dataframes", {}).items():
+            get_cached_dataframe(name, path)    
         
     def save_config(self, config_path):
         with open(config_path, 'w') as stream:

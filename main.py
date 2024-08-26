@@ -9,11 +9,14 @@ faulthandler.enable()
 import cProfile
 import pstats
 import io
-
+from tqdm import tqdm
+from tqdm.contrib.logging import logging_redirect_tqdm
+import argparse
 def generate_image(config: Config):
     dataloader = ImageDataLoader(".",  config["foreground_objects"], seed=config["seed"])
     background_dataloader = BackgroundDataLoader(config["background_folder"], seed=config["seed"])
     background = background_dataloader.get_image()
+    background = cv2.resize(background, (config["size"][0], config["size"][1]))
     
     if "Background" in config["transformations"].keys():
         for transformation in config["transformations"]["Background"]:
@@ -31,15 +34,22 @@ def generate_image(config: Config):
     scene.filters = config["filters"]
     scene.apply_filter()
     scene.configure_annotator(config["annotator"])
-    scene.write("test.jpg", config["size"])
-    scene.show(show_mask=False)
+    #scene.show()
+    #scene.write(Path("output.jpg"), config["size"])
+    return scene
+
+def generate_image_wrapper(config: Config):
+    scene = generate_image(config)
     bboxes = [fg.bbox.coordinates.astype(int) for fg in scene.foregrounds]
     coordinates = np.array([[bbox[0], bbox[1], bbox[0]+bbox[2], bbox[1]+bbox[3]] for bbox in bboxes])
     return scene.background, coordinates, scene.annotator
 
-def main(data_config_path: Path, transformation_config_path: Path):
+def main(data_config_path: Path, transformation_config_path: Path, output_path: Path):
     config = Config(".", transformation_config_path, data_config_path)
-    generate_image(config)
+    with logging_redirect_tqdm():
+        for i in tqdm(range(config["total_images"])):
+            scene = generate_image(config)
+            scene.write(output_path / f"image_{i}.jpg", config["size"])
 
 def profile_main(data_config_path: str, transformation_config_path: str):
     pr = cProfile.Profile()
@@ -55,5 +65,11 @@ def profile_main(data_config_path: str, transformation_config_path: str):
     print(s.getvalue())    
     
 if __name__ == "__main__":
-    #profile_main('data_config.yaml', 'transformation_config.yaml')
-    main('/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/data_config.yaml', '/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/transformation_config.yaml')
+    parser = argparse.ArgumentParser(description="Synthetic Image Generator")
+    parser.add_argument('--data-config', type=Path, required=False, help="Path to the data config YAML file", default='/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/data_config.yaml')
+    parser.add_argument('--transformation-config', type=Path, required=False, help="Path to the transformation config YAML file", default='/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/transformation_config.yaml')
+    parser.add_argument('--output-path', type=Path, required=False, help="Path to the output directory", default='/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/output')
+
+    args = parser.parse_args()
+
+    main(args.data_config, args.transformation_config, args.output_path)

@@ -78,7 +78,7 @@ class RandomRotate(Rotate):
         
 @register_transformation
 class RotateFromDataFrame(Rotate):
-    def __init__(self, dataframe_path, column_name):
+    def __init__(self, dataframe_path, column_name="angle"):
         self.dataframe_path = dataframe_path
         self.column_name = column_name
         self.data = get_cached_dataframe(self.dataframe_path)

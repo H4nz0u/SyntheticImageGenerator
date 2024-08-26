@@ -5,6 +5,8 @@ from object_position import BasePositionDeterminer
 from annotations import BaseAnnotator
 import os
 from typing import List
+from pathlib import Path
+from utilities import logger
 class Scene:
     def __init__(self, background) -> None:
         self.background = background
@@ -56,13 +58,17 @@ class Scene:
 
     def configure_annotator(self, annotator: BaseAnnotator):
         self.annotator = annotator
+        self.annotator.__init__()
 
-    def write(self, path, size, annotation=True):
+    def write(self, path: Path, size, annotation=True):
         image = cv2.resize(self.background, size)
         if annotation:
+            if not path.parent.exists():
+                os.makedirs(path.parent)
             filename = os.path.basename(path)
             file_ending = filename.split(".")[-1]
-            xml_path = path.replace(file_ending, "xml")
+            # Replace the file ending with xml
+            xml_path = path.with_name(filename.replace(file_ending, "xml"))
             for obj in self.foregrounds:
                 if obj.segmentation.size > 0:
                     self.annotator.append_object(obj.segmentation, obj.cls)

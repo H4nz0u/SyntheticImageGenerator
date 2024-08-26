@@ -34,4 +34,4 @@ def parse_voc_xml(file_path):
         }
 
 if __name__ == "__main__":
-    print(parse_voc_xml("images\signs\image49478.xml"))
+    print(parse_voc_xml("/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/images/manually_cut_out_signs/Klimaschild-China/image7182.xml"))

@@ -86,3 +86,29 @@ class ScaleFromDataFrame(Scale):
         self.factor = self._select_factor(obj.cls)
         logger.info(f'Applying Scaling using factor from DataFrame: {self.factor}')
         super().apply(obj)
+
+@register_transformation
+class ScaleToAreaFromDataFrame(ScaleToArea):
+    def __init__(self, dataframe_path, background_size, column_name="area"):
+        self.dataframe_path = dataframe_path
+        self.column_name = column_name
+        self.data = get_cached_dataframe(self.dataframe_path)
+        target_area_ratio = 1
+        super().__init__(target_area_ratio, background_size=background_size)
+
+    def _select_target_area_ratio(self, cls):
+        try:
+            # Filter the DataFrame by the class
+            filtered_data = self.data[self.data['class'] == cls]
+            ratio_values = filtered_data[self.column_name].dropna()
+            if len(ratio_values) == 0:
+                raise ValueError(f"No valid ratio values found for class '{cls}' in column '{self.column_name}'.")
+            return np.random.choice(ratio_values)
+        except Exception as e:
+            logger.error(f"Failed to select an ratio for class '{cls}': {e}")
+            raise
+
+    def apply(self, obj: ImgObject):
+        self.target_area_ratio = self._select_target_area_ratio(obj.cls)
+        logger.info(f'Applying Scaling using ratio from DataFrame: {self.target_area_ratio}')
+        super().apply(obj)

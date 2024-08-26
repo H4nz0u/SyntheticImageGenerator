@@ -3,7 +3,7 @@ from utilities import register_transformation
 from image_management import ImgObject
 import cv2
 import numpy as np
-from utilities import logger
+from utilities import logger, get_cached_dataframe
 @register_transformation
 class ShearX(Transformation):
     def __init__(self, shear_factor):
@@ -12,11 +12,13 @@ class ShearX(Transformation):
         logger.info(f"Applying X-Shear by factor {self.shear_factor}")
         image = obj.image
         height, width =  image.shape[:2]
+        
+        new_width = int(width + abs(height * self.shear_factor))
         M = np.float32([[1, self.shear_factor, 0], [0, 1, 0]]) 
-        image = cv2.warpAffine(image, M, (int(width+height*self.shear_factor), height))
+        image = cv2.warpAffine(image, M, (new_width, height))
         obj.image = image
         if obj.mask.size > 0:
-            obj.mask = cv2.warpAffine(obj.mask, M, (int(width+height*self.shear_factor), height))
+            obj.mask = cv2.warpAffine(obj.mask, M, (new_width, height))
         obj.bbox.coordinates = self.transform_bbox(obj)
         if obj.segmentation.size > 0:
             obj.segmentation = self.transform_segmentation(obj.segmentation, M)
@@ -72,7 +74,7 @@ class ShearY(Transformation):
         image = obj.image
         height, width = image.shape[:2]
         M = np.float32([[1, 0, 0], [self.shear_factor, 1, 0]])  # Adjusted for y-direction shear
-        new_height = int(height + width * self.shear_factor)
+        new_height = int(height + abs(width * self.shear_factor))
 
         # Apply shear transformation to the image and mask
         obj.image = cv2.warpAffine(image, M, (width, new_height))
@@ -122,3 +124,55 @@ class RandomShearY(ShearY):
     def apply(self, image: cv2.typing.MatLike):
         super().apply(image)
         self.shear_factor = np.random.uniform(self.min_shear_factor, self.max_shear_factor)
+
+@register_transformation
+class ShearXFromDataFrame(ShearX):
+    def __init__(self, dataframe_path, column_name="shear_y"):
+        self.dataframe_path = dataframe_path
+        self.column_name = column_name
+        self.data = get_cached_dataframe(self.dataframe_path)
+        shear_factor = 1
+        super().__init__(shear_factor)
+
+    def _select_shear_factor(self, cls):
+        try:
+            # Filter the DataFrame by the class
+            filtered_data = self.data[self.data['class'] == cls]
+            factor_values = filtered_data[self.column_name].dropna()
+            if len(factor_values) == 0:
+                raise ValueError(f"No valid factor values found for class '{cls}' in column '{self.column_name}'.")
+            return np.random.choice(factor_values)
+        except Exception as e:
+            logger.error(f"Failed to select an factor for class '{cls}': {e}")
+            raise
+
+    def apply(self, obj: ImgObject):
+        self.shear_factor = self._select_shear_factor(obj.cls)
+        logger.info(f'Applying ShearX using factor from DataFrame: {self.shear_factor}')
+        super().apply(obj)
+
+@register_transformation
+class ShearYFromDataFrame(ShearY):
+    def __init__(self, dataframe_path, column_name="shear_y"):
+        self.dataframe_path = dataframe_path
+        self.column_name = column_name
+        self.data = get_cached_dataframe(self.dataframe_path)
+        shear_factor = 1
+        super().__init__(shear_factor)
+
+    def _select_shear_factor(self, cls):
+        try:
+            # Filter the DataFrame by the class
+            filtered_data = self.data[self.data['class'] == cls]
+            factor_values = filtered_data[self.column_name].dropna()
+            if len(factor_values) == 0:
+                raise ValueError(f"No valid factor values found for class '{cls}' in column '{self.column_name}'.")
+            return np.random.choice(factor_values)
+        except Exception as e:
+            logger.error(f"Failed to select an factor for class '{cls}': {e}")
+            raise
+
+    def apply(self, obj: ImgObject):
+        self.shear_factor = self._select_shear_factor(obj.cls)
+        logger.info(f'Applying ShearY using factor from DataFrame: {self.shear_factor}')
+        super().apply(obj)

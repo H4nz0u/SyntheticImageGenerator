@@ -1,6 +1,7 @@
 from image_management import ImgObject
 import numpy as np
 import cv2
+from utilities import logger
 class Transformation:
     def apply(self, image: ImgObject):
         raise NotImplementedError('The apply method must be implemented by the subclass')
@@ -23,4 +24,5 @@ class Transformation:
 
         # The bounding box is (x_min, y_min, width, height)
         bbox = np.array([x_min, y_min, x_max - x_min, y_max - y_min])
+        logger.debug(f"New BBox coordinates: {bbox}")
         return bbox
