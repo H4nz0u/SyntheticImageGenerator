@@ -3,8 +3,11 @@ background_folder: backgrounds_dataset_GMD/
 foreground_objects:
   #Typlabel-China: ISI-Typlabelchina-Schilder/
   #Typlabel-USA: ISI-Typlabelchina-Schilder/
-  Klimaschild-China: manually_cut_out_signs/Klimaschild-China/
+  Klimaschild-Japan: manually_cut_out_signs/Klimaschild-China/
+  #RDS-NAR: sorted_warped_images_with_xml/RDS-NAR
 annotation: PascalVOC
+overwrite_classes:
+  Klimaschild-Japan: Klimaschild-China
 dataframes:
-  "standard": /data/horse/ws/joka888b-syntheticImageGenerator/imageAnalysis/bbox_data.pkl
+  "standard": /data/horse/ws/joka888b-syntheticImageGenerator/imageAnalysis/bbox_data_homo_train.pkl
 size: [2304, 1728]

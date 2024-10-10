@@ -7,6 +7,7 @@ import os
 from typing import List
 from pathlib import Path
 from utilities import logger
+from filter.brightness import TargetBrightness
 class Scene:
     def __init__(self, background) -> None:
         self.background = background
@@ -18,20 +19,23 @@ class Scene:
     
     def apply_filter(self):
         for filter in self.filters:
-            self.background = filter.apply(self.background)
+            if isinstance(filter, TargetBrightness):
+                self.background = filter.apply(self.background, self.foregrounds[0].bbox.coordinates)
+            else:
+                self.background = filter.apply(self.background)
             
     def add_foreground(self, foreground: ImgObject):
         self.foregrounds.append(foreground)
         x_start, y_start, x_end, y_end = self.positionDeterminer.get_position(self.background, self.foregrounds)        
 
         # Clipping dimensions if necessary
-        clipped_width = x_end - x_start
-        clipped_height = y_end - y_start
+        target_width = x_end - x_start
+        target_height = y_end - y_start
 
         # Use clipped image regions
-        clipped_image = foreground.image[:clipped_height, :clipped_width]
+        clipped_image = cv2.resize(foreground.image, (target_width, target_height))
         if foreground.mask is not None:
-            clipped_mask = foreground.mask[:clipped_height, :clipped_width]
+            clipped_mask = cv2.resize(foreground.mask, (target_width, target_height))
 
             # Normalize and prepare mask for blending
             mask = clipped_mask.astype(np.float32) / 255.0
@@ -48,9 +52,15 @@ class Scene:
             # Simply place the clipped image if no mask is provided
             self.background[y_start:y_end, x_start:x_end] = clipped_image
 
-        foreground.bbox.coordinates += np.array([x_start, y_start, 0, 0])
+        foreground.bbox.coordinates = np.array([x_start, y_start, target_width, target_height])
         if foreground.segmentation is not None:
+            scale_x = target_width / foreground.image.shape[1]
+            scale_y = target_height / foreground.image.shape[0]
+            scale_matrix = np.array([scale_x, scale_y])
+            foreground.segmentation = (foreground.segmentation * scale_matrix).astype(int)
             foreground.segmentation += np.array([x_start, y_start])
+            
+        self.add_annotation(foreground)
 
 
     def configure_positioning(self, positionDeterminer: BasePositionDeterminer):
@@ -58,7 +68,15 @@ class Scene:
 
     def configure_annotator(self, annotator: BaseAnnotator):
         self.annotator = annotator
-        self.annotator.__init__()
+        self.annotator.reset()
+    
+    def add_annotation(self, obj):
+        if obj.segmentation.size > 0:
+            self.annotator.append_object(obj.segmentation, obj.cls)
+        else:
+            c = obj.bbox.coordinates
+            bbox_coordinates = np.array([(c[0],c[1]), (c[0]+c[2], c[1]), (c[0]+c[2], c[1]+c[3]), (c[0], c[1]+c[3])])
+            self.annotator.append_object(bbox_coordinates, obj.cls)
 
     def write(self, path: Path, size, annotation=True):
         image = cv2.resize(self.background, size)
@@ -68,14 +86,7 @@ class Scene:
             filename = os.path.basename(path)
             file_ending = filename.split(".")[-1]
             # Replace the file ending with xml
-            xml_path = path.with_name(filename.replace(file_ending, "xml"))
-            for obj in self.foregrounds:
-                if obj.segmentation.size > 0:
-                    self.annotator.append_object(obj.segmentation, obj.cls)
-                else:
-                    c = obj.bbox.coordinates
-                    bbox_coordinates = np.array([(c[0],c[1]), (c[0]+c[2], c[1]), (c[0]+c[2], c[1]+c[3]), (c[0], c[1]+c[3])])
-                    self.annotator.append_object(bbox_coordinates, obj.cls)
+            xml_path = path.with_name(filename.replace(file_ending, "xml"))                
             self.annotator.write_xml(xml_path, image.shape)
         cv2.imwrite(path, image)
 

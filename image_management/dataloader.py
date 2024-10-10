@@ -32,7 +32,7 @@ class ImageDataLoader(DataLoader):
         object_image_paths = {obj: self._get_image_paths_for_type(path) for obj, path in self.objects.items()}
         return object_image_paths
     
-    #@lru_cache(maxsize=1024)
+    @lru_cache(maxsize=1024)
     def _serve_object(self, image_path: str) -> ImgObject:
         try:
             file_ending = image_path.split(".")[-1]
@@ -58,7 +58,7 @@ class BackgroundDataLoader(DataLoader):
         super().__init__(root_path, seed)
         self.background_image_paths = self._get_image_paths_for_type(root_path)
 
-    #@lru_cache(maxsize=1024)
+    @lru_cache(maxsize=1024)
     def _serve_background(self, image_path: str):
         return cv2.imread(image_path)
 

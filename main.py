@@ -22,18 +22,24 @@ def generate_image(config: Config):
         for transformation in config["transformations"]["Background"]:
             background = transformation.apply(background)
     scene = Scene(background)
+    scene.configure_annotator(config["annotator"])
     scene.configure_positioning(config["positioning"])
 
     for object_label in config["foreground_objects"].keys():
         for i in range(config["object_counts"].get(object_label, 0)):
             image: ImgObject = dataloader.get_image(object_label)
+            if scene.annotator.overwrite_classes and image.cls in scene.annotator.overwrite_classes.values():
+                for key, value in scene.annotator.overwrite_classes.items():
+                    if value == image.cls:
+                        new_class = key
+                        break
+                image.cls = new_class
             image.apply_transformations(config["transformations"][object_label])
         
             scene.add_foreground(image)
     
     scene.filters = config["filters"]
     scene.apply_filter()
-    scene.configure_annotator(config["annotator"])
     #scene.show()
     #scene.write(Path("output.jpg"), config["size"])
     return scene

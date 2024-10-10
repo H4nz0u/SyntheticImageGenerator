@@ -6,11 +6,17 @@ from utilities import register_annotation
 
 @register_annotation
 class PascalVOC(BaseAnnotator):
-    def __init__(self):
+    def __init__(self, overwrite_classes: Dict[str, str] = None):
         super().__init__()
         self.root = etree.Element('annotation')
         self.objects = list()
-
+        self.overwrite_classes = overwrite_classes
+        segmented = etree.SubElement(self.root, 'segmented')
+        segmented.text = '1'
+    
+    def reset(self):
+        self.root = etree.Element('annotation')
+        self.objects = list()
         segmented = etree.SubElement(self.root, 'segmented')
         segmented.text = '1'
         
@@ -22,6 +28,8 @@ class PascalVOC(BaseAnnotator):
         object_id = etree.SubElement(object_element, 'id')
         object_id.text = str(len(self.objects)+1)
         name = etree.SubElement(object_element, 'name')
+        if self.overwrite_classes and class_label in self.overwrite_classes:
+            class_label = self.overwrite_classes[class_label]
         name.text = class_label
         etree.SubElement(object_element, 'partId')
         segmentation_node = self._get_segmentation_subtree(ordered_mask_points)

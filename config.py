@@ -9,6 +9,7 @@ from annotations import BaseAnnotator
 import os
 
 class Config:
+    data_config: Dict = {}
     def __init__(self, 
                  base_path: str = None, 
                  transform_config_path: str = None, 
@@ -20,7 +21,6 @@ class Config:
             self.config = {}
             self._load_dataframes()
             self.merge_configs()
-            
             try:
                 self._validate_config()
             except Exception as e:
@@ -40,9 +40,10 @@ class Config:
                 'object_counts': {"Typlabel-China": 1},
                 'seed': 42,
                 'total_images': 1,
-                'size': (800, 600),
+                'size': (1300, 867),
                 'annotator': self._parse_annotation("PascalVOC")
-            }  
+            }
+            self.data_config = {}
     def load_config(self, config_path: str):
         """Load a YAML configuration file and return a dictionary."""
         try:
@@ -69,7 +70,7 @@ class Config:
             'root_path': self.data_config.get('root_path', ''),
             'background_folder': os.path.join(self.data_config.get('root_path', ''), self.data_config.get('background_folder', '')),
             'positioning': self._parse_positioning(self.transform_config.get('positioning', {})),
-            'size': self.data_config.get('size', (800, 600)),
+            'size': self.data_config.get('size', (2304, 1728)),
             'annotator': self._parse_annotation(self.data_config.get('annotation', None)),
         }     
 
@@ -132,7 +133,13 @@ class Config:
         return fil
     
     def _parse_annotation(self, annotation: str) -> BaseAnnotator:
-        return create_annotation(annotation)
+        if self.data_config is not None:
+            overwrite_classes = self.data_config.get('overwrite_classes', {})
+        else:
+            overwrite_classes = {}
+        annotator = create_annotation(annotation, overwrite_classes=overwrite_classes)
+        return annotator
+
         
     def _validate_path(self, path):
         if not os.path.exists(path):
@@ -194,9 +201,15 @@ class Config:
         self.config['object_counts'] = object_counts
 
     def _convert_to_dict(self):
+        def serialize(obj):
+            # This helper function filters out non-serializable attributes
+            if isinstance(obj, Transformation) or isinstance(obj, Filter):
+                # Only include JSON serializable properties
+                return {k: v for k, v in obj.__dict__.items() if isinstance(v, (str, int, float, bool, list, dict, type(None)))}
+            return obj
         config_dict = {
-            'transformations': {label: [t.__dict__ for t in trans] for label, trans in self.config['transformations'].items()},
-            'filters': [f.__dict__ for f in self.config['filters']],
+            'transformations': {label: [serialize(t) for t in trans] for label, trans in self.config['transformations'].items()},            'filters': [f.__dict__ for f in self.config['filters']],
+            'filters': [serialize(f) for f in self.config['filters']],
             'blending': self.config['blending_mode'],
             'positioning': self.config['positioning'].__dict__ if self.config['positioning'] else None,
             'total_images': self.config['total_images'],

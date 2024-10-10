@@ -13,7 +13,7 @@ def setup_logging():
 
     # Create a custom logger
     logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG)  # Set the minimum level of log messages
+    logger.setLevel(logging.INFO)  # Set the minimum level of log messages
 
     # Create handlers
     c_handler = logging.StreamHandler()  # Console handler
@@ -36,3 +36,14 @@ def setup_logging():
     return logger
 
 logger = setup_logging()
+import sys
+import traceback
+
+def exception_handler(exc_type, exc_value, exc_traceback):
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+    print(f"Uncaught exception: {exc_value}")
+    traceback.print_tb(exc_traceback)
+
+sys.excepthook = exception_handler

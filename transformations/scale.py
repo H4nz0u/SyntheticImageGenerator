@@ -40,7 +40,7 @@ class RandomScale(Scale):
         
 @register_transformation
 class ScaleToArea(Scale):
-    def __init__(self, target_area_ratio: float, background_size: int):
+    def __init__(self, target_area_ratio: float, background_size: int = 1127000):
         self.target_area_ratio = target_area_ratio
         self.background_size = background_size
         
@@ -63,7 +63,7 @@ class RandomScaleToArea(ScaleToArea):
 
 @register_transformation
 class ScaleFromDataFrame(Scale):
-    def __init__(self, dataframe_path, column_name):
+    def __init__(self, dataframe_path, column_name="area"):
         self.dataframe_path = dataframe_path
         self.column_name = column_name
         self.data = get_cached_dataframe(self.dataframe_path)

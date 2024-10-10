@@ -16,22 +16,43 @@ class TargetBrightness(Filter):
     def __init__(self, target_brightness: float) -> None:
         self.target_brightness = target_brightness
 
-    def apply(self, image):
-        current_brightness = np.mean(image)
+    def apply(self, image, bbox=None):
+        """
+        Applies the target brightness filter to the image.
 
-        if current_brightness == 0:
-            scaling_factor = 0
+        :param image: Input image.
+        :param bbox: Optional bounding box (xmin, ymin, xmax, ymax) to calculate brightness.
+        :return: Brightness adjusted image.
+        """
+        if bbox is not None and len(bbox) == 4:
+            xmin, ymin, xmax, ymax = bbox
+            #convert to int
+            xmin, ymin, xmax, ymax = int(xmin), int(ymin), int(xmax), int(ymax)
+            bbox_image = image[ymin:ymax, xmin:xmax]
+            current_brightness = np.mean(bbox_image) if bbox_image.size > 0 else np.nan
+        else:
+            # Default to the whole image mean if no bbox or invalid bbox is provided
+            current_brightness = np.mean(image)
+
+        if np.isnan(current_brightness) or current_brightness == 0 or self.target_brightness == 0:
+            scaling_factor = 1
         else:
             scaling_factor = self.target_brightness / current_brightness
 
         image = cv2.convertScaleAbs(image, alpha=scaling_factor, beta=0)
-
         return image
-
+    
 @register_filter
 class RandomTargetBrightness(TargetBrightness):
     def __init__(self, min_brightness: float, max_brightness: float) -> None:
-        super().__init__(np.random.randint(min_brightness, max_brightness))
+        self.min_brightness = min_brightness
+        self.max_brightness = max_brightness
+        random = np.random.uniform(min_brightness, max_brightness)
+        super().__init__(random)
+    def apply(self, image, bbox=None):
+        random = np.random.uniform(self.min_brightness, self.max_brightness)
+        super().__init__(random)
+        return super().apply(image, bbox)
 
 @register_filter
 class TargetBrightnessFromDataFrame(TargetBrightness):
@@ -55,7 +76,7 @@ class TargetBrightnessFromDataFrame(TargetBrightness):
             logger.error(f"Failed to select an brightness value for class '{cls}': {e}")
             raise
 
-    def apply(self, img):
+    def apply(self, img, bbox=None):
         self.target_brightness = self._select_target_brightness(self.cls)
         logger.info(f'Applying Brightness filter using factor from DataFrame: {self.target_brightness}')
-        return super().apply(img)
+        return super().apply(img, bbox)

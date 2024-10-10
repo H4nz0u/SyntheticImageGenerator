@@ -1,31 +1,14 @@
 transformations:
-  "Klimaschild-China":
-    - "name": "AffineTransformationFromDataFrame"
+  "Klimaschild-Japan":
+    - "name": "HomographyTransformationFromDataFrame"
       "dataframe_path": "standard"
     - "name": "ScaleToAreaFromDataFrame"
       "dataframe_path": "standard"
-      "background_size": 3981312
-
-#    - "name": "Greyscale"
-#    - "name": "ShearYFromDataFrame"
-#      "dataframe_path": "standard"
-#    - "name": "RotateFromDataFrame"
-#      "dataframe_path": "standard"
-#    - "name": "ShearXFromDataFrame"
-#      "dataframe_path": "standard"
-#    - "name": "ScaleToAreaFromDataFrame"
-#      "dataframe_path": "standard"
-#      "background_size": 3981312
-#  "Background":
-#    - "name": "Zoom"
-#      "zoom_factor": 1
-#      "zoom_position_x": 0.5
-#      "zoom_position_y": 0.8
-
+      "background_size": 1127000
 filters:
   - "name": "TargetBrightnessFromDataFrame"
     "dataframe_path": "standard"
-    "class_name": "Klimaschild-China"
+    "class_name": "Klimaschild-Japan"
 
 blending: "Standard"
 
@@ -33,7 +16,7 @@ positioning:
   "name": "DataframePositionDeterminer"
   "dataframe_path": "standard"
 
-total_images: 1000
+total_images: 10
 seed: 42
 object_amount: 
-  "Klimaschild-China": 1
+  "Klimaschild-Japan": 1

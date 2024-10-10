@@ -7,7 +7,11 @@ from utilities import parse_voc_xml
 
 class ImgObject:
     def __init__(self, image_path: str, annotation_path: str) -> None:
-        self.image = cv2.imread(image_path)
+        try:
+            self.image = cv2.imread(image_path)
+        except Exception as e:
+            print(image_path)
+            raise e
         self.parse_annotation(annotation_path)
         self.cut_out_object()
     
