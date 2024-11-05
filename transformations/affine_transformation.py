@@ -89,8 +89,9 @@ class AffineTransformation(Transformation):
         
         if obj.segmentation.size > 0:
             self._transform_segmentation(obj, M_adjusted, new_width, new_height)
-        if obj.mask.size > 0:
-            self._transform_mask(obj, M_adjusted, new_height, new_width)
+        if obj.mask:
+            if obj.mask.size > 0:
+                self._transform_mask(obj, M_adjusted, new_height, new_width)
         self._transform_bbox(obj, M_adjusted)
 
 

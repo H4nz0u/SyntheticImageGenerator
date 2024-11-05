@@ -33,8 +33,9 @@ class Rotate(Transformation):
             self._transform_segmentation(obj, M, new_width, new_height)
         self._transform_bbox(obj, M)
         logger.info(f'New BBox coordinates: {obj.bbox.coordinates}')
-        if obj.mask.size > 0:
-            self._transform_mask(obj, M, new_height, new_width)
+        if obj.mask:
+            if obj.mask.size > 0:
+                self._transform_mask(obj, M, new_height, new_width)
 
     
 

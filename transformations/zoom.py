@@ -10,9 +10,10 @@ from typing import List
 class Zoom(Transformation):
     def __init__(self, zoom_factor, zoom_position_x: float = 0.5, zoom_position_y: float = 0.5):
         self.zoom_factor = zoom_factor
-        self.zoom_position: List[float, float] = [zoom_position_x, zoom_position_y]
+        self.zoom_position: List[float] = [zoom_position_x, zoom_position_y]
         
-    def apply(self, image: cv2.typing.MatLike):
+    def apply(self, obj: ImgObject):
+        image = obj.image
         zoom_factor, zoom_window = self.calculate_zoom_parameters(image)
         image = cv2.resize(image[zoom_window[1]:zoom_window[3], zoom_window[0]:zoom_window[2]], (image.shape[1], image.shape[0]))
         return image

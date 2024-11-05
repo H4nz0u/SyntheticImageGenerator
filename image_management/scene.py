@@ -8,11 +8,12 @@ from typing import List
 from pathlib import Path
 from utilities import logger
 from filter.brightness import TargetBrightness
+from filter import Filter
 class Scene:
     def __init__(self, background) -> None:
         self.background = background
         self.foregrounds: List[ImgObject] = []
-        self.filters = []
+        self.filters: List[Filter] = []
     
     def add_filter(self, filter):
         self.filters.append(filter)
@@ -88,7 +89,7 @@ class Scene:
             # Replace the file ending with xml
             xml_path = path.with_name(filename.replace(file_ending, "xml"))                
             self.annotator.write_xml(xml_path, image.shape)
-        cv2.imwrite(path, image)
+        cv2.imwrite(path.as_posix(), image)
 
     def show(self, show_bbox=True, show_mask=True, show_segmentation=True, show_class=True):
         display_image = self.background.copy()
@@ -120,7 +121,7 @@ class Scene:
             x, y, w, h = fg.bbox.coordinates.astype(int)
             x = min(max(x, 0), display_image.shape[1] - 1)
             y = max(min(y, display_image.shape[0] - 1), 0)
-            if hasattr(fg, 'mask'):
+            if fg.mask:
                 resized_mask = cv2.resize(fg.mask, (w, h)) 
 
                 colored_mask = cv2.applyColorMap((resized_mask * 255).astype(np.uint8), cv2.COLORMAP_JET)

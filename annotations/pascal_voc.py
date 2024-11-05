@@ -3,14 +3,14 @@ from typing import List, Tuple, Dict
 import os
 from . import BaseAnnotator
 from utilities import register_annotation
+from pathlib import Path
 
 @register_annotation
 class PascalVOC(BaseAnnotator):
-    def __init__(self, overwrite_classes: Dict[str, str] = None):
-        super().__init__()
+    def __init__(self, overwrite_classes: Dict[str, str] = {}):
+        super().__init__(overwrite_classes)
         self.root = etree.Element('annotation')
         self.objects = list()
-        self.overwrite_classes = overwrite_classes
         segmented = etree.SubElement(self.root, 'segmented')
         segmented.text = '1'
     
@@ -60,7 +60,7 @@ class PascalVOC(BaseAnnotator):
         height = etree.SubElement(size_element, 'height')
         height.text = str(h)
     
-    def write_xml(self, output_path: str, size: Tuple[int, int, int]):
+    def write_xml(self, output_path: Path, size: Tuple[int, int, int]):
         self.set_size(size)
         filename_element = etree.SubElement(self.root, 'filename')
         filename_element.text = os.path.basename(output_path)

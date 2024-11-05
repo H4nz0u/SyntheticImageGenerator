@@ -98,10 +98,11 @@ class HomographyTransformation(Transformation):
             logger.info(f"Resized image to ({self.bbox_width}, {self.bbox_height})")
             
             # Resize mask if it exists
-            if obj.mask.size > 0:
-                obj.mask = cv2.resize(obj.mask, (self.bbox_width, self.bbox_height), interpolation=cv2.INTER_NEAREST)
-                logger.info(f"Resized mask to ({self.bbox_width}, {self.bbox_height})")
-            
+            if obj.mask:
+                if obj.mask.size > 0:
+                    obj.mask = cv2.resize(obj.mask, (self.bbox_width, self.bbox_height), interpolation=cv2.INTER_NEAREST)
+                    logger.info(f"Resized mask to ({self.bbox_width}, {self.bbox_height})")
+                
             # Scale segmentation points
             if obj.segmentation is not None and len(obj.segmentation) > 0:
                 obj.segmentation = self._scale_segmentation(obj.segmentation, scaling_factor_x, scaling_factor_y)
@@ -142,8 +143,9 @@ class HomographyTransformation(Transformation):
         # Transform other attributes if they exist
         if obj.segmentation.size > 0:
             self._transform_segmentation(obj, H_adjusted, new_width, new_height)
-        if obj.mask.size > 0:
-            self._transform_mask(obj, H_adjusted, new_width, new_height)
+        if obj.mask:
+            if obj.mask.size > 0:
+                self._transform_mask(obj, H_adjusted, new_width, new_height)
         self._transform_bbox(obj, H_adjusted, new_width, new_height)
 
     def _transform_mask(self, obj, H, new_width, new_height):

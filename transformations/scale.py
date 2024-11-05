@@ -17,8 +17,9 @@ class Scale(Transformation):
         
         new_dim = (new_width, new_height)
         resized_image = cv2.resize(image, new_dim, interpolation=cv2.INTER_AREA)
-        if obj.mask.size > 0:
-            obj.mask = cv2.resize(obj.mask, new_dim, interpolation=cv2.INTER_AREA)
+        if obj.mask:
+            if obj.mask.size > 0:
+                obj.mask = cv2.resize(obj.mask, new_dim, interpolation=cv2.INTER_AREA)
         obj.image = resized_image
         if obj.segmentation.size > 0:
             segmentation = obj.segmentation.astype(np.float32)

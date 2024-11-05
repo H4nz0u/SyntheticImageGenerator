@@ -76,7 +76,7 @@ class TargetBrightnessFromDataFrame(TargetBrightness):
             logger.error(f"Failed to select an brightness value for class '{cls}': {e}")
             raise
 
-    def apply(self, img, bbox=None):
+    def apply(self, image, bbox=None):
         self.target_brightness = self._select_target_brightness(self.cls)
         logger.info(f'Applying Brightness filter using factor from DataFrame: {self.target_brightness}')
-        return super().apply(img, bbox)
+        return super().apply(image, bbox)

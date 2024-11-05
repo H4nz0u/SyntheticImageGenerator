@@ -14,11 +14,12 @@ class ShearX(Transformation):
         height, width =  image.shape[:2]
         
         new_width = int(width + abs(height * self.shear_factor))
-        M = np.float32([[1, self.shear_factor, 0], [0, 1, 0]]) 
+        M = np.array([[1, self.shear_factor, 0], [0, 1, 0]], dtype=np.float32) 
         image = cv2.warpAffine(image, M, (new_width, height))
         obj.image = image
-        if obj.mask.size > 0:
-            obj.mask = cv2.warpAffine(obj.mask, M, (new_width, height))
+        if obj.mask:
+            if obj.mask.size > 0:
+                obj.mask = cv2.warpAffine(obj.mask, M, (new_width, height))
         obj.bbox.coordinates = self.transform_bbox(obj)
         if obj.segmentation.size > 0:
             obj.segmentation = self.transform_segmentation(obj.segmentation, M)
@@ -61,8 +62,8 @@ class RandomShearX(ShearX):
         self.max_shear_factor = max_shear_factor
         super().__init__(np.random.uniform(min_shear_factor, max_shear_factor))
 
-    def apply(self, image: cv2.typing.MatLike):
-        super().apply(image)
+    def apply(self, obj: ImgObject):
+        super().apply(obj)
         self.shear_factor = np.random.uniform(self.min_shear_factor, self.max_shear_factor)
 
 @register_transformation
@@ -73,13 +74,14 @@ class ShearY(Transformation):
     def apply(self, obj: ImgObject):
         image = obj.image
         height, width = image.shape[:2]
-        M = np.float32([[1, 0, 0], [self.shear_factor, 1, 0]])  # Adjusted for y-direction shear
+        M = np.array([[1, 0, 0], [self.shear_factor, 1, 0]], dtype=np.float32)
         new_height = int(height + abs(width * self.shear_factor))
 
         # Apply shear transformation to the image and mask
         obj.image = cv2.warpAffine(image, M, (width, new_height))
-        if obj.mask.size > 0:
-            obj.mask = cv2.warpAffine(obj.mask, M, (width, new_height))
+        if obj.mask:
+            if obj.mask.size > 0:
+                obj.mask = cv2.warpAffine(obj.mask, M, (width, new_height))
         
         obj.bbox.coordinates = self.transform_bbox(obj)
         if obj.segmentation.size > 0:
@@ -121,8 +123,8 @@ class RandomShearY(ShearY):
         self.max_shear_factor = max_shear_factor
         super().__init__(np.random.uniform(min_shear_factor, max_shear_factor))
 
-    def apply(self, image: cv2.typing.MatLike):
-        super().apply(image)
+    def apply(self, obj: ImgObject):
+        super().apply(obj)
         self.shear_factor = np.random.uniform(self.min_shear_factor, self.max_shear_factor)
 
 @register_transformation

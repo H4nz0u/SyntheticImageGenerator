@@ -18,7 +18,7 @@ class Greyscale(Transformation):
 class RandomGreyscale(Greyscale):
     def __init__(self, probability: float):
         self.probability = probability
-        super().__init()
+        super().__init__()
         
     def apply(self, obj: ImgObject):
         if np.random.rand() < self.probability:

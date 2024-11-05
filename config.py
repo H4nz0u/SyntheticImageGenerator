@@ -6,44 +6,27 @@ from image_management import ImageDataLoader
 from utilities import create_transformation, create_positionDeterminer, create_filter, create_annotation, logger, get_cached_dataframe
 from typing import List, Dict
 from annotations import BaseAnnotator
+from pathlib import Path
 import os
 
 class Config:
     data_config: Dict = {}
     def __init__(self, 
-                 base_path: str = None, 
-                 transform_config_path: str = None, 
-                 data_config_path: str = None):
-        if base_path and transform_config_path and data_config_path:
-            self.base_path = base_path
-            self.transform_config = self.load_config(os.path.join(base_path, transform_config_path))
-            self.data_config = self.load_config(os.path.join(base_path, data_config_path))
-            self.config = {}
-            self._load_dataframes()
-            self.merge_configs()
-            try:
-                self._validate_config()
-            except Exception as e:
-                logger.error(f'Error validating config: {e}')
-                raise e
-        else:
-            self.config = {
-                'transformations': {},
-                'filters': [],
-                'blending_mode': 'Standard',
-                'positioning': None,
-                'foreground_objects': {
-                    "Typlabel-China": r"/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/images/ISI-Typlabelchina-Schilder/"
-                },
-                'background_folder': r'/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/images/cars/',
-                'root_path': r'/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/images/',
-                'object_counts': {"Typlabel-China": 1},
-                'seed': 42,
-                'total_images': 1,
-                'size': (1300, 867),
-                'annotator': self._parse_annotation("PascalVOC")
-            }
-            self.data_config = {}
+                 base_path: Path, 
+                 transform_config_path: Path, 
+                 data_config_path: Path):
+        self.base_path = base_path
+        self.transform_config = self.load_config(os.path.join(base_path, transform_config_path))
+        self.data_config = self.load_config(os.path.join(base_path, data_config_path))
+        self.config = {}
+        self._load_dataframes()
+        self.merge_configs()
+        try:
+            self._validate_config()
+        except Exception as e:
+            logger.error(f'Error validating config: {e}')
+            raise e
+
     def load_config(self, config_path: str):
         """Load a YAML configuration file and return a dictionary."""
         try:
@@ -111,22 +94,22 @@ class Config:
             return list(self.data_config['foreground_objects'].keys())
         return label.replace(" ", "").split(',')
     
-    def _parse_transformation(self, label, transformations: dict, transforms: dict) -> Transformation:
+    def _parse_transformation(self, label, transformations: dict, transforms: dict) -> None:
         labels = self._parse_label(label)
-        for l in labels:
-            if l not in transforms.keys():
-                transforms[l] = []
+        for label in labels:
+            if label not in transforms.keys():
+                transforms[label] = []
             for transformation in transformations:
-                transforms[l].append(create_transformation(**transformation))
+                transforms[label].append(create_transformation(**transformation))
     
-    def _parse_transformations(self, transformations: dict) -> List[Transformation]:
-        transforms = {}
+    def _parse_transformations(self, transformations: dict) -> Dict[str, List[Transformation]]:
+        transforms: Dict[str, List[Transformation]] = {}
         for label in transformations.keys():
             self._parse_transformation(label, transformations[label], transforms)    
         return transforms
     
     
-    def _parse_filters(self, filters: []) -> List[Filter]:
+    def _parse_filters(self, filters: List = []) -> List[Filter]:
         fil = []
         for filter in filters:
             fil.append(create_filter(**filter))
@@ -158,13 +141,6 @@ class Config:
         self.dataframes = {}
         for name, path in self.data_config.get("dataframes", {}).items():
             get_cached_dataframe(name, path)    
-        
-    def save_config(self, config_path):
-        with open(config_path, 'w') as stream:
-            try:
-                yaml.dump(self.params, stream)
-            except yaml.YAMLError as exc:
-                logger.error(exc)
     
     def get(self, key, default=None):
         return self.config.get(key, default)
@@ -225,7 +201,28 @@ class Config:
 
     def __str__(self):
         return str(self.config)
+    
+class OptimizationConfig(Config):
+    def __init__(self):
+        self.config = {
+            'transformations': {},
+            'filters': [],
+            'blending_mode': 'Standard',
+            'positioning': None,
+            'foreground_objects': {
+                "Typlabel-China": r"/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/images/ISI-Typlabelchina-Schilder/"
+            },
+            'background_folder': r'/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/images/cars/',
+            'root_path': r'/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/images/',
+            'object_counts': {"Typlabel-China": 1},
+            'seed': 42,
+            'total_images': 1,
+            'size': (1300, 867),
+            'annotator': self._parse_annotation("PascalVOC")
+        }
+        self.data_config = {}
+
 
 if __name__ == "__main__":
-    config = Config(".", "transformation_config.yaml", "data_config.yaml")
+    config = Config(Path("."), Path("transformation_config.yaml"), Path("data_config.yaml"))
     print(config)

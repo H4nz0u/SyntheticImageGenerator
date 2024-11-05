@@ -29,11 +29,15 @@ def generate_image(config: Config):
         for i in range(config["object_counts"].get(object_label, 0)):
             image: ImgObject = dataloader.get_image(object_label)
             if scene.annotator.overwrite_classes and image.cls in scene.annotator.overwrite_classes.values():
+                new_class = None
                 for key, value in scene.annotator.overwrite_classes.items():
                     if value == image.cls:
                         new_class = key
                         break
-                image.cls = new_class
+                if new_class:
+                    image.cls = new_class
+                else:
+                    logger.error(f"Class {image.cls} not found in overwrite_classes")
             image.apply_transformations(config["transformations"][object_label])
         
             scene.add_foreground(image)
@@ -51,17 +55,17 @@ def generate_image_wrapper(config: Config):
     return scene.background, coordinates, scene.annotator
 
 def main(data_config_path: Path, transformation_config_path: Path, output_path: Path):
-    config = Config(".", transformation_config_path, data_config_path)
+    config = Config(Path("."), transformation_config_path, data_config_path)
     with logging_redirect_tqdm():
         for i in tqdm(range(config["total_images"])):
             scene = generate_image(config)
             scene.write(output_path / f"image_{i}.jpg", config["size"])
 
-def profile_main(data_config_path: str, transformation_config_path: str):
+def profile_main(data_config_path: Path, transformation_config_path: Path, output_path: Path):
     pr = cProfile.Profile()
     pr.enable()
     
-    main(data_config_path, transformation_config_path)
+    main(data_config_path, transformation_config_path, output_path)
     
     pr.disable()
     s = io.StringIO()
@@ -75,7 +79,10 @@ if __name__ == "__main__":
     parser.add_argument('--data-config', type=Path, required=False, help="Path to the data config YAML file", default='/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/data_config.yaml')
     parser.add_argument('--transformation-config', type=Path, required=False, help="Path to the transformation config YAML file", default='/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/transformation_config.yaml')
     parser.add_argument('--output-path', type=Path, required=False, help="Path to the output directory", default='/data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/output')
-
+    parser.add_argument('--profile', action='store_true', help="Profile the code")
     args = parser.parse_args()
 
-    main(args.data_config, args.transformation_config, args.output_path)
+    if args.profile:
+        profile_main(args.data_config, args.transformation_config, args.output_path)
+    else:
+        main(args.data_config, args.transformation_config, args.output_path)
