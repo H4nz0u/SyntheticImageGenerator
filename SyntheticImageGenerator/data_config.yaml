@@ -1,0 +1,15 @@
+root_path: /data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/images/
+background_folder: backgrounds_dataset_GMD_resized/
+foreground_objects:
+  Klimaschild-China: "sorted_correct_images2/Klimaschild-China"
+  #Typlabel-USA: ISI-Typlabelchina-Schilder/
+  #RDS-NAR: /data/horse/ws/joka888b-syntheticImageGenerator/SyntheticImageGenerator/images/RDS-NAR-Optimization/foreground
+  #RDS-NAR: sorted_warped_images_with_xml/RDS-NAR
+annotation: PascalVOC
+dataframes:
+  standard:
+    path: /data/horse/ws/joka888b-syntheticImageGenerator/imageAnalysis/statsDetermination/output/distance_evaluation_real_images_homography/csv/data.csv
+    correlated_columns:
+      - ['aspect_ratio', 'transformation_matrix', 'area', 'upper_left_x', 'upper_left_y']
+      - ['angle', 'scaling', 'position']
+size: [1300, 867]

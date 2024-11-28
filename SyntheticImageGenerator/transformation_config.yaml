@@ -1,0 +1,29 @@
+transformations:
+  "Klimaschild-China":
+    - name: "AffineTransformation"
+      angle: -10
+      scale_x: 1.2
+      scale_y: 0.99
+      shear: -0.26
+    - name: "ScaleToArea"
+      target_area_ratio: 0.20
+      
+  "Background":
+    - name : "MatchAspectRatio"
+      aspect_ratio: 1.83
+    
+filters:
+  - "name": "TargetBrightness"
+    "target_brightness": 136.74
+
+blending: "FeatheredBlending"
+
+positioning: 
+  "name": "FixedPositionDeterminer"
+  "x_pos": 0.19
+  "y_pos": 0.28
+
+total_images: 1
+seed: 46
+object_amount: 
+  "Klimaschild-China": 1

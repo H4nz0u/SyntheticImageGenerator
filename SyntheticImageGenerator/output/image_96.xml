@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<annotation>
+  <segmented>1</segmented>
+  <object>
+    <bndbox>
+      <xmin>7</xmin>
+      <ymin>143</ymin>
+      <xmax>1240</xmax>
+      <ymax>553</ymax>
+    </bndbox>
+    <id>1</id>
+    <name>RDS-NAR</name>
+    <partId/>
+    <segmentation>
+      <point>
+        <index>0</index>
+        <x>28</x>
+        <y>143</y>
+      </point>
+      <point>
+        <index>1</index>
+        <x>7</x>
+        <y>522</y>
+      </point>
+      <point>
+        <index>2</index>
+        <x>1240</x>
+        <y>553</y>
+      </point>
+      <point>
+        <index>3</index>
+        <x>1233</x>
+        <y>227</y>
+      </point>
+    </segmentation>
+  </object>
+  <size>
+    <depth>3</depth>
+    <width>867</width>
+    <height>1300</height>
+  </size>
+  <filename>image_96.xml</filename>
+</annotation>
